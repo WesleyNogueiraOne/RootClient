@@ -1,0 +1,980 @@
+/* ============================================================
+   HOOT CLIENT - Fantasy Steampunk Theme
+   Roxo profundo + Ouro envelhecido + Engrenagens + Runas
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+:root {
+    --gold: #c9a227;
+    --gold-dark: #8B6914;
+    --gold-light: #e8c84a;
+    --purple-deep: #1a0f2e;
+    --purple-mid: #2a1550;
+    --purple-light: #533AB0;
+    --purple-muted: #3d2460;
+    --purple-soft: #7a5fa0;
+    --purple-text: #9d7fc5;
+    --rune-glow: rgba(201, 162, 39, 0.15);
+    --overlay-dark: rgba(15, 8, 30, 0.85);
+    --border-gold: 1px solid rgba(201, 162, 39, 0.4);
+    --border-purple: 1px solid rgba(83, 58, 176, 0.3);
+}
+
+/* ============================================================
+   FUNDO COM SLIDESHOW
+   ============================================================ */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Crimson Pro', 'Avenir Book', serif;
+    color: #e8d5b7;
+    background: var(--purple-deep);
+    overflow: hidden;
+}
+
+/* Slideshow de fundo */
+#bgSlideshow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+}
+
+.bgSlide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 2s ease;
+}
+
+.bgSlide.active {
+    opacity: 1;
+}
+
+.bgSlide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(15, 8, 30, 0.6) 0%,
+        rgba(15, 8, 30, 0.4) 40%,
+        rgba(15, 8, 30, 0.7) 80%,
+        rgba(15, 8, 30, 0.92) 100%
+    );
+}
+
+/* Runas decorativas ao fundo */
+#bgRunes {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.rune {
+    position: absolute;
+    font-size: 48px;
+    color: rgba(201, 162, 39, 0.06);
+    animation: runeFloat 20s ease-in-out infinite;
+    font-family: serif;
+}
+
+.rune:nth-child(1)  { top: 5%;  left: 3%;   font-size: 64px; animation-delay: 0s; }
+.rune:nth-child(2)  { top: 15%; right: 5%;  font-size: 40px; animation-delay: 3s; }
+.rune:nth-child(3)  { top: 40%; left: 1%;   font-size: 56px; animation-delay: 6s; }
+.rune:nth-child(4)  { top: 60%; right: 3%;  font-size: 48px; animation-delay: 2s; }
+.rune:nth-child(5)  { top: 80%; left: 5%;   font-size: 36px; animation-delay: 9s; }
+.rune:nth-child(6)  { top: 30%; right: 8%;  font-size: 52px; animation-delay: 4s; }
+.rune:nth-child(7)  { top: 70%; left: 2%;   font-size: 44px; animation-delay: 7s; }
+.rune:nth-child(8)  { top: 90%; right: 6%;  font-size: 38px; animation-delay: 1s; }
+
+@keyframes runeFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.04; }
+    50% { transform: translateY(-15px) rotate(5deg); opacity: 0.10; }
+}
+
+/* Névoa */
+#bgFog {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%; height: 35%;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to top,
+        rgba(83, 58, 176, 0.08) 0%,
+        rgba(201, 162, 39, 0.03) 60%,
+        transparent 100%
+    );
+    animation: fogDrift 15s ease-in-out infinite;
+}
+
+@keyframes fogDrift {
+    0%, 100% { opacity: 0.5; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(-20px); }
+}
+
+/* Engrenagens decorativas */
+#bgGears {
+    position: fixed;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.gear-deco {
+    position: fixed;
+    border-radius: 50%;
+    border: 2px solid rgba(139, 105, 20, 0.12);
+    animation: gearSpin linear infinite;
+}
+
+.gear-deco::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 162, 39, 0.08);
+}
+
+.gear-deco.g1 {
+    width: 120px; height: 120px;
+    bottom: 5%; left: -30px;
+    animation-duration: 30s;
+}
+
+.gear-deco.g2 {
+    width: 80px; height: 80px;
+    top: 10%; right: -20px;
+    animation-duration: 20s;
+    animation-direction: reverse;
+}
+
+.gear-deco.g3 {
+    width: 60px; height: 60px;
+    bottom: 20%; right: 15%;
+    animation-duration: 25s;
+    opacity: 0.5;
+}
+
+@keyframes gearSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   FRAME BAR
+   ============================================================ */
+
+#frameBar {
+    position: relative;
+    z-index: 200;
+    background: rgba(15, 8, 30, 0.95);
+    border-bottom: 1px solid rgba(139, 105, 20, 0.4);
+    -webkit-user-select: none;
+}
+
+#frameTitleText {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+}
+
+.frameButton {
+    background: none;
+    border: none;
+    height: 22px;
+    width: 39px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.frameButton:hover { background: rgba(201, 162, 39, 0.15); }
+.frameButton:active { background: rgba(201, 162, 39, 0.25); }
+.frameButton:focus { outline: none; }
+
+#frameButton_close:hover,
+#frameButton_close:focus {
+    background: rgba(180, 30, 30, 0.5) !important;
+}
+
+/* ============================================================
+   LANDING CONTAINER
+   ============================================================ */
+
+#landingContainer {
+    height: 100%;
+    position: relative;
+    z-index: 10;
+    overflow-y: hidden;
+}
+
+/* ============================================================
+   LOGO / SEAL - Coruja
+   ============================================================ */
+
+#image_seal_container {
+    position: relative;
+    height: 90px;
+    width: 90px;
+    border-radius: 50%;
+    margin-top: 40px;
+}
+
+#image_seal {
+    height: 90px;
+    width: 90px;
+    border-radius: 50%;
+    border: 2px solid var(--gold-dark);
+    box-sizing: border-box;
+    object-fit: cover;
+    filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.3));
+    transition: filter 0.3s ease;
+}
+
+#image_seal:hover {
+    filter: drop-shadow(0 0 16px rgba(201, 162, 39, 0.6));
+}
+
+/* Anel ornamental ao redor da coruja */
+#image_seal_container::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 162, 39, 0.3);
+    animation: sealPulse 4s ease-in-out infinite;
+}
+
+#image_seal_container::after {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 162, 39, 0.1);
+}
+
+@keyframes sealPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+/* ============================================================
+   PAINEL DIREITO - Avatar e Ícones
+   ============================================================ */
+
+#rightContainer {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    top: 40px;
+    align-items: flex-start;
+    height: calc(100% - 40px);
+}
+
+#user_content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    position: relative;
+}
+
+#avatarContainer {
+    border-radius: 50%;
+    border: 2px solid var(--gold-dark);
+    box-sizing: border-box;
+    background: rgba(26, 15, 46, 0.8);
+    height: 70px;
+    width: 70px;
+    overflow: hidden;
+    position: relative;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    box-shadow: 0 0 12px rgba(139, 105, 20, 0.3);
+}
+
+#avatarOverlay {
+    opacity: 0;
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.25s ease;
+    font-weight: bold;
+    letter-spacing: 2px;
+    background-color: rgba(26, 15, 46, 0.7);
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    font-size: 9px;
+    color: var(--gold);
+}
+
+#avatarOverlay:hover, #avatarOverlay:focus { opacity: 1; }
+
+#user_text {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    min-width: 135px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(201, 162, 39, 0.4);
+    position: absolute;
+    right: 95px;
+    text-align: right;
+    -webkit-user-select: initial;
+}
+
+/* Ícones de mídia */
+.mediaSVG {
+    fill: var(--gold-dark);
+    height: 12px;
+    transition: 0.25s ease;
+    cursor: pointer;
+    width: 25px;
+}
+
+.mediaSVG:hover { fill: var(--gold); height: 18px; }
+.mediaURL:focus .mediaSVG { fill: var(--gold); }
+
+.mediaDivider {
+    height: 1px;
+    width: 14px;
+    background: var(--gold-dark);
+    margin: 10px 0;
+    opacity: 0.5;
+}
+
+#settingsSVG {
+    stroke: var(--gold-dark);
+    fill: none;
+    height: 15px;
+}
+
+.mediaButton:hover #settingsSVG,
+.mediaButton:focus #settingsSVG {
+    stroke: var(--gold);
+    height: 22px;
+}
+
+#settingsTooltip {
+    visibility: hidden;
+    opacity: 0;
+    width: 75px;
+    height: 20px;
+    background: rgba(15, 8, 30, 0.95);
+    border: var(--border-gold);
+    color: var(--gold);
+    text-align: center;
+    border-radius: 3px;
+    position: absolute;
+    z-index: 1;
+    right: 130%;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    line-height: 20px;
+    transition: visibility 0s linear 0.25s, opacity 0.25s ease;
+}
+
+.mediaButton:hover #settingsTooltip,
+.mediaButton:focus #settingsTooltip {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+}
+
+/* ============================================================
+   PAINEL INFERIOR
+   ============================================================ */
+
+#landingContainer > #lower {
+    height: 23%;
+    display: flex;
+    background: linear-gradient(to top,
+        rgba(15, 8, 30, 0.95) 0%,
+        rgba(15, 8, 30, 0.7) 60%,
+        transparent 100%
+    );
+    border-top: 1px solid rgba(201, 162, 39, 0.1);
+}
+
+/* Labels e divisores */
+.bot_label {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+}
+
+.bot_divider {
+    height: 25px;
+    width: 1px;
+    background: linear-gradient(to bottom,
+        transparent, rgba(201, 162, 39, 0.4), transparent
+    );
+    margin: 0 20px;
+}
+
+/* Status do servidor */
+#player_count {
+    color: var(--purple-text);
+    font-size: 8px;
+    font-weight: 900;
+    margin-left: 10px;
+}
+
+#mojang_status_icon {
+    font-size: 28px;
+    color: var(--gold-dark);
+    margin-left: 12px;
+}
+
+#mojangStatusTooltip {
+    background: rgba(15, 8, 30, 0.97);
+    border: var(--border-gold);
+    border-radius: 4px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    color: var(--gold);
+}
+
+/* ============================================================
+   BOTÃO DE NEWS
+   ============================================================ */
+
+#newsButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+#newsButtonText {
+    color: var(--gold-dark);
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    letter-spacing: 3px;
+    font-size: 10px;
+    line-height: 30px;
+    display: flex;
+    transition: 0.25s ease;
+    text-transform: uppercase;
+}
+
+#newsButton:hover #newsButtonText,
+#newsButton:focus #newsButtonText {
+    color: var(--gold);
+    text-shadow: 0 0 15px rgba(201, 162, 39, 0.6);
+}
+
+.arrowLine {
+    stroke: var(--gold-dark) !important;
+}
+
+#newsButton:hover .arrowLine,
+#newsButton:focus .arrowLine {
+    stroke: var(--gold) !important;
+}
+
+/* ============================================================
+   BOTÃO LAUNCH
+   ============================================================ */
+
+#launch_button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-shadow: none;
+    font-size: 18px;
+    padding: 0;
+    transition: 0.3s ease;
+    outline: none;
+    color: var(--gold);
+    text-transform: uppercase;
+    position: relative;
+}
+
+#launch_button::before {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right,
+        transparent, var(--gold-dark), transparent
+    );
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#launch_button:hover::before,
+#launch_button:focus::before {
+    opacity: 1;
+}
+
+#launch_button:hover,
+#launch_button:focus {
+    color: var(--gold-light);
+    text-shadow: 0 0 20px rgba(201, 162, 39, 0.7),
+                 0 0 40px rgba(201, 162, 39, 0.4);
+}
+
+#launch_button:active {
+    color: var(--gold-dark);
+    text-shadow: none;
+}
+
+#launch_button:disabled {
+    color: var(--purple-soft);
+    cursor: default;
+    pointer-events: none;
+}
+
+#server_selection_button {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--gold-dark);
+    padding: 0;
+    transition: 0.25s ease;
+    text-transform: uppercase;
+}
+
+#server_selection_button:hover,
+#server_selection_button:focus {
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(201, 162, 39, 0.5);
+}
+
+/* Progress bar */
+#launch_progress_label {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    min-width: 53px;
+    max-width: 53px;
+    text-align: right;
+}
+
+#launch_progress[value] {
+    height: 2px;
+    width: 265px;
+    -webkit-appearance: none;
+}
+#launch_progress[value]::-webkit-progress-bar {
+    background: rgba(83, 58, 176, 0.3);
+    border-radius: 2px;
+}
+#launch_progress[value]::-webkit-progress-value {
+    background: linear-gradient(to right, var(--gold-dark), var(--gold));
+    border-radius: 2px;
+}
+
+#launch_details_text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--purple-text);
+}
+
+/* ============================================================
+   OVERLAY
+   ============================================================ */
+
+#overlayContainer {
+    background: rgba(15, 8, 30, 0.88);
+}
+
+#overlayContent {
+    border: var(--border-gold);
+    background: rgba(26, 15, 46, 0.97);
+    border-radius: 4px;
+    padding: 20px;
+}
+
+#overlayTitle {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 2px;
+}
+
+#overlayDesc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 13px;
+    color: var(--purple-text);
+}
+
+#overlayAcknowledge {
+    background: rgba(83, 58, 176, 0.2);
+    border: var(--border-gold);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    border-radius: 2px;
+    padding: 5px 15px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+#overlayAcknowledge:hover {
+    background: rgba(201, 162, 39, 0.2);
+    box-shadow: 0 0 12px rgba(201, 162, 39, 0.3);
+}
+
+#overlayDismiss {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    color: var(--purple-soft);
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+
+#settingsContainer {
+    background: rgba(15, 8, 30, 0.97);
+    border-top: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+#settingsNavHeader #settingsNavHeaderText {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 2px;
+}
+
+.settingsNavItem {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--purple-soft);
+    background: none;
+    border: none;
+    text-align: left;
+    margin: 5px 0;
+    padding: 0 20px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+    text-transform: uppercase;
+}
+
+.settingsNavItem:hover,
+.settingsNavItem:focus {
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(201, 162, 39, 0.4);
+}
+
+.settingsNavItem[selected] {
+    color: var(--gold);
+    cursor: default;
+}
+
+.settingsNavDivider {
+    width: 75%;
+    height: 1px;
+    background: rgba(201, 162, 39, 0.2);
+    margin-left: auto;
+    margin-bottom: 25px;
+}
+
+#settingsNavDone {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    background: none;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+    text-transform: uppercase;
+}
+#settingsNavDone:hover {
+    text-shadow: 0 0 15px rgba(201, 162, 39, 0.7);
+}
+
+.settingsTabHeaderText {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    color: var(--gold);
+    letter-spacing: 2px;
+}
+
+.settingsTabHeaderDesc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 12px;
+    color: var(--purple-text);
+}
+
+.settingsFieldTitle {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 1px;
+}
+
+.settingsFieldDesc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 12px;
+    color: var(--purple-text);
+    margin-top: 5px;
+}
+
+.settingsFieldContainer {
+    border-bottom: 1px solid rgba(201, 162, 39, 0.15);
+}
+
+#settingsContainer input[type=number],
+#settingsContainer input[type=text] {
+    color: var(--gold);
+    background: rgba(42, 21, 80, 0.5);
+    border: var(--border-gold);
+    border-radius: 2px;
+    font-family: 'Crimson Pro', serif;
+    transition: 0.25s ease;
+}
+#settingsContainer input[type=number]:focus,
+#settingsContainer input[type=text]:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(201, 162, 39, 0.2);
+}
+
+.toggleSwitchSlider {
+    background: rgba(83, 58, 176, 0.3);
+    border: 1px solid rgba(83, 58, 176, 0.5);
+}
+input:checked + .toggleSwitchSlider {
+    background: rgba(201, 162, 39, 0.5);
+    border: 1px solid var(--gold-dark);
+}
+
+/* ============================================================
+   NEWS
+   ============================================================ */
+
+#newsContainer {
+    background: rgba(15, 8, 30, 0.97);
+    border-top: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+#newsArticleTitle {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+#newsArticleTitle:hover { text-shadow: 0 0 15px rgba(201, 162, 39, 0.6); }
+
+#newsArticleDate {
+    background: var(--gold-dark);
+    color: var(--purple-deep);
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+#newsArticleAuthor {
+    background: var(--purple-muted);
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+}
+
+#newsArticleComments {
+    color: var(--purple-text);
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+#newsArticleComments:hover { color: var(--gold); }
+
+/* ============================================================
+   LOGIN / WELCOME
+   ============================================================ */
+
+#loginContainer, #welcomeContainer {
+    background: rgba(15, 8, 30, 0.85);
+}
+
+#loginImageSeal, #welcomeImageSeal {
+    border: 2px solid var(--gold-dark);
+    background: rgba(26, 15, 46, 0.8);
+    box-shadow: 0 0 15px rgba(201, 162, 39, 0.2);
+}
+
+#loginSubheader {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    letter-spacing: 3px;
+    font-size: 11px;
+}
+
+#welcomeHeader {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    letter-spacing: 2px;
+    font-size: 18px;
+}
+
+.loginField {
+    font-family: 'Crimson Pro', serif;
+    background: rgba(42, 21, 80, 0.4);
+    border-width: 0 0 1px 0;
+    border-color: var(--gold-dark);
+    color: var(--gold-light);
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.loginField::-webkit-input-placeholder {
+    color: var(--purple-soft);
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+#loginButton, #welcomeButton {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    letter-spacing: 3px;
+    font-size: 12px;
+    font-weight: 700;
+}
+#loginButton:hover, #welcomeButton:hover {
+    text-shadow: 0 0 15px rgba(201, 162, 39, 0.7);
+}
+
+.loginSpanDim { color: var(--purple-soft); }
+
+/* ============================================================
+   LOADING SPINNER
+   ============================================================ */
+
+#loadingContainer {
+    background: var(--purple-deep);
+    z-index: 400;
+}
+
+#loadCenterImage, #loadSpinnerImage {
+    filter: sepia(50%) hue-rotate(280deg) saturate(2) brightness(0.8);
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: rgba(42, 21, 80, 0.2); }
+::-webkit-scrollbar-thumb {
+    background: var(--gold-dark);
+    border-radius: 3px;
+}
+
+/* ============================================================
+   SERVER SELECTION
+   ============================================================ */
+
+.serverListing {
+    background: rgba(42, 21, 80, 0.4);
+    border: var(--border-gold);
+    border-radius: 2px;
+    transition: 0.25s ease;
+}
+.serverListing:hover, .serverListing[selected] {
+    background: rgba(83, 58, 176, 0.3);
+    border-color: var(--gold);
+}
+
+.serverListingName {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 1px;
+}
+
+.serverListingDescription,
+.serverListingRevision {
+    font-family: 'Crimson Pro', serif;
+    color: var(--purple-text);
+}
+
+#serverSelectHeader, #accountSelectHeader {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    letter-spacing: 3px;
+}
+
+#serverSelectConfirm, #accountSelectConfirm {
+    font-family: 'Cinzel', serif;
+    border: var(--border-gold);
+    color: var(--gold);
+    background: rgba(83, 58, 176, 0.2);
+    border-radius: 2px;
+    letter-spacing: 2px;
+}
+#serverSelectConfirm:hover { box-shadow: 0 0 12px rgba(201, 162, 39, 0.4); }
+
+#serverSelectCancel, #accountSelectCancel {
+    font-family: 'Cinzel', serif;
+    color: var(--purple-soft);
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   UPDATE AVAILABLE
+   ============================================================ */
+
+#updateAvailableTooltip {
+    background: rgba(15, 8, 30, 0.95);
+    border: var(--border-gold);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+}
+
+@keyframes glow-grow {
+    0% { opacity: 0; transform: scale(1); }
+    80% { opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+#image_seal_container[update]::before,
+#image_seal_container[update]::after {
+    box-shadow: 0 0 15px var(--gold-dark);
+    animation: glow-grow 4s ease-out infinite;
+    background: rgba(201, 162, 39, 0.08);
+}
+

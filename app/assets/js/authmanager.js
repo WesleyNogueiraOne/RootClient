@@ -438,6 +438,8 @@ exports.addOfflineAccount = function(username) {
         username,
         username
     )
+    ret.type = 'offline'
+    ConfigManager.getAuthAccounts()[ret.uuid].type = 'offline'
     ConfigManager.save()
     return ret
 }

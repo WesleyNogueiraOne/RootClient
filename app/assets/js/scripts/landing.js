@@ -1024,3 +1024,85 @@ async function loadNews(){
 
     return await promise
 }
+
+// Tabs do painel de notícias
+// ═══════════════════════════════ NEWS TABS
+document.querySelectorAll('.news-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.news-tab').forEach(t => t.classList.remove('active'))
+        tab.classList.add('active')
+        const target = tab.getAttribute('data-tab')
+        document.getElementById('hootNewsList').style.display = target === 'news' ? 'flex' : 'none'
+        document.getElementById('hootJournalList').style.display = target === 'journal' ? 'flex' : 'none'
+        if(target === 'journal') loadJournal()
+        if(target === 'news') loadHootNews()
+    })
+})
+
+async function loadHootNews() {
+    const list = document.getElementById('hootNewsList')
+    try {
+        const distro = await DistroAPI.getDistribution()
+        const raw = distro.rawDistribution || distro
+        if(!raw.news || raw.news.length === 0) {
+            list.innerHTML = '<div class="hoot-news-placeholder">Nenhuma novidade ainda.</div>'
+            return
+        }
+        list.innerHTML = raw.news.map(entry => `
+            <div class="news-item">
+                ${entry.image ? `<img class="news-item-image" src="${entry.image}" alt="${entry.title}" data-url="${entry.image}" data-action="open">` : ''}
+                ${entry.video ? `<div class="news-video-thumb" data-url="${entry.video.replace('embed/', 'watch?v=')}" data-action="open">
+                    <img src="https://img.youtube.com/vi/${entry.video.split('/').pop()}/maxresdefault.jpg" alt="video">
+                    <div class="news-video-play">▶</div>
+                </div>` : ''}
+                <div class="news-item-title">${entry.title}</div>
+                <div class="news-item-desc">${entry.content}</div>
+                <div class="news-item-date">${entry.category} · ${entry.date} · ${entry.author}</div>
+            </div>
+        `).join('')
+
+        list.querySelectorAll('[data-action="open"]').forEach(el => {
+            el.addEventListener('click', () => {
+                const { shell } = require('electron')
+                shell.openExternal(el.getAttribute('data-url'))
+            })
+        })
+    } catch(e) {
+        list.innerHTML = '<div class="hoot-news-placeholder">Erro ao carregar notícias.</div>'
+        console.error('News load error:', e)
+    }
+}
+
+async function loadJournal() {
+    const list = document.getElementById('hootJournalList')
+    try {
+        const distro = await DistroAPI.getDistribution()
+        const raw = distro.rawDistribution || distro
+        if(!raw.journal || raw.journal.length === 0) {
+            list.innerHTML = '<div class="hoot-news-placeholder">Nenhuma publicação ainda.</div>'
+            return
+        }
+        list.innerHTML = raw.journal.map(entry => `
+            <div class="news-item">
+                ${entry.image ? `<img class="news-item-image" src="${entry.image}" alt="${entry.title}" data-url="${entry.image}" data-action="open">` : ''}
+                ${entry.video ? `<div class="news-video-thumb" data-url="${entry.video.replace('embed/', 'watch?v=')}" data-action="open">
+                    <img src="https://img.youtube.com/vi/${entry.video.split('/').pop()}/maxresdefault.jpg" alt="video">
+                    <div class="news-video-play">▶</div>
+                </div>` : ''}
+                <div class="news-item-title">${entry.title}</div>
+                <div class="news-item-desc">${entry.content}</div>
+                <div class="news-item-date">${entry.category} · ${entry.date} · ${entry.author}</div>
+            </div>
+        `).join('')
+
+        list.querySelectorAll('[data-action="open"]').forEach(el => {
+            el.addEventListener('click', () => {
+                const { shell } = require('electron')
+                shell.openExternal(el.getAttribute('data-url'))
+            })
+        })
+    } catch(e) {
+        list.innerHTML = '<div class="hoot-news-placeholder">Erro ao carregar jornal.</div>'
+        console.error('Journal load error:', e)
+    }
+}

@@ -45,7 +45,58 @@ class ProcessBuilder {
      * Convienence method to run the functions typically used to build a process.
      */
     build(){
-        fs.ensureDirSync(this.gameDir)
+    fs.ensureDirSync(this.gameDir)
+    
+    // ===== Verificar e instalar libraries do NeoForge =====
+    const bootstrapPath = path.join(this.commonDir, 'libraries', 'cpw', 'mods', 'bootstraplauncher')
+if(!fs.existsSync(bootstrapPath)) {
+    logger.info('NeoForge libraries not found, running installer...')
+    const installerPath = path.join(this.gameDir, 'files', 'neoforge-installer', '21.1.224', 'neoforge-installer-21.1.224.jar')
+    if(fs.existsSync(installerPath)) {
+            const javaExe = ConfigManager.getJavaExecutable(this.server.rawServer.id)
+            const launcherProfilesPath = path.join(this.commonDir, 'launcher_profiles.json')
+if(!fs.existsSync(launcherProfilesPath)) {
+    fs.writeJsonSync(launcherProfilesPath, {
+        profiles: {},
+        selectedProfile: null,
+        clientToken: require('crypto').randomBytes(16).toString('hex'),
+        authenticationDatabase: {}
+    })
+    logger.info('Created launcher_profiles.json')
+}
+            const result = require('child_process').spawnSync(javaExe, [
+    '-jar', installerPath,
+    '--installClient', this.commonDir
+], { 
+    stdio: 'pipe',
+    cwd: this.commonDir
+})
+logger.info('NeoForge installer stdout:', result.stdout?.toString())
+logger.info('NeoForge installer stderr:', result.stderr?.toString())
+logger.info('NeoForge installer exited with code:', result.status)
+        }
+        
+    }
+    
+    // ===== FIM NeoForge installer =====
+    
+    for(let mdl of this.server.modules) {
+        if(mdl.rawModule.type === 'File') {
+            const srcFile = mdl.getPath()
+            const extractTo = mdl.rawModule.extractTo
+            
+            if(!extractTo) continue
+            
+            if(srcFile.endsWith('.zip')) {
+                const destDir = path.join(this.gameDir, extractTo)
+                fs.ensureDirSync(destDir)
+                const zip = new AdmZip(srcFile)
+                zip.extractAllTo(destDir, true)
+                logger.info('Extracted zip:', srcFile, '->', destDir)
+            }
+        }
+    }
+        
         const tempNativePath = path.join(os.tmpdir(), ConfigManager.getTempNativeFolder(), crypto.pseudoRandomBytes(16).toString('hex'))
         process.throwDeprecation = true
         this.setupLiteLoader()

@@ -84,6 +84,7 @@ ipcMain.on('autoUpdateAction', (event, arg, data) => {
             break
     }
 })
+
 // Redirect distribution index event from preloader to renderer.
 ipcMain.on('distributionIndexDone', (event, res) => {
     event.sender.send('distributionIndexDone', res)
@@ -108,7 +109,6 @@ ipcMain.handle(SHELL_OPCODE.TRASH_ITEM, async (event, ...args) => {
 // https://electronjs.org/docs/tutorial/offscreen-rendering
 app.disableHardwareAcceleration()
 
-
 const REDIRECT_URI_PREFIX = 'https://login.microsoftonline.com/common/oauth2/nativeclient?'
 
 // Microsoft Auth Login
@@ -130,7 +130,7 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
         width: 520,
         height: 600,
         frame: true,
-        icon: getPlatformIcon('SealCircle')
+        icon: getPlatformIcon('logo')
     })
 
     msftAuthWindow.on('closed', () => {
@@ -145,16 +145,9 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
 
     msftAuthWindow.webContents.on('did-navigate', (_, uri) => {
         if (uri.startsWith(REDIRECT_URI_PREFIX)) {
-            let queries = uri.substring(REDIRECT_URI_PREFIX.length).split('#', 1).toString().split('&')
-            let queryMap = {}
-
-            queries.forEach(query => {
-                const [name, value] = query.split('=')
-                queryMap[name] = decodeURI(value)
-            })
-
+            const urlParams = new URLSearchParams(uri.substring(REDIRECT_URI_PREFIX.length).split('#')[0])
+            let queryMap = Object.fromEntries(urlParams.entries())
             ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.SUCCESS, queryMap, msftAuthViewSuccess)
-
             msftAuthSuccess = true
             msftAuthWindow.close()
             msftAuthWindow = null
@@ -183,7 +176,7 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGOUT, (ipcEvent, uuid, isLastAccount) => {
         width: 520,
         height: 600,
         frame: true,
-        icon: getPlatformIcon('SealCircle')
+        icon: getPlatformIcon('logo')
     })
 
     msftLogoutWindow.on('closed', () => {
@@ -207,7 +200,6 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGOUT, (ipcEvent, uuid, isLastAccount) => {
                     msftLogoutSuccessSent = true
                     ipcEvent.reply(MSFT_OPCODE.REPLY_LOGOUT, MSFT_REPLY_TYPE.SUCCESS, uuid, isLastAccount)
                 }
-
                 if(msftLogoutWindow) {
                     msftLogoutWindow.close()
                     msftLogoutWindow = null
@@ -225,11 +217,10 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGOUT, (ipcEvent, uuid, isLastAccount) => {
 let win
 
 function createWindow() {
-
     win = new BrowserWindow({
         width: 980,
         height: 552,
-        icon: getPlatformIcon('SealCircle'),
+        icon: getPlatformIcon('logo'),
         frame: false,
         webPreferences: {
             preload: path.join(__dirname, 'app', 'assets', 'js', 'preloader.js'),
@@ -247,13 +238,12 @@ function createWindow() {
     Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
 
     win.loadURL(pathToFileURL(path.join(__dirname, 'app', 'app.ejs')).toString())
-
-    /*win.once('ready-to-show', () => {
-        win.show()
-    })*/
+    setTimeout(() => {
+        win.webContents.openDevTools({ mode: 'detach' })
+    }, 3000)
 
     win.removeMenu()
-    win.webContents.openDevTools({ mode: 'detach' })
+    win.webContents.openDevTools()
     win.resizable = true
 
     win.on('closed', () => {
@@ -262,10 +252,7 @@ function createWindow() {
 }
 
 function createMenu() {
-    
     if(process.platform === 'darwin') {
-
-        // Extend default included application menu to continue support for quit keyboard shortcut
         let applicationSubMenu = {
             label: 'Application',
             submenu: [{
@@ -282,7 +269,6 @@ function createMenu() {
             }]
         }
 
-        // New edit menu adds support for text-editing keyboard shortcuts
         let editSubMenu = {
             label: 'Edit',
             submenu: [{
@@ -314,15 +300,10 @@ function createMenu() {
             }]
         }
 
-        // Bundle submenus into a single template and build a menu object with it
         let menuTemplate = [applicationSubMenu, editSubMenu]
         let menuObject = Menu.buildFromTemplate(menuTemplate)
-
-        // Assign it to the application
         Menu.setApplicationMenu(menuObject)
-
     }
-
 }
 
 function getPlatformIcon(filename){
@@ -337,24 +318,24 @@ function getPlatformIcon(filename){
             ext = 'png'
             break
     }
-
     return path.join(__dirname, 'app', 'assets', 'images', `${filename}.${ext}`)
 }
 
-app.on('ready', createWindow)
-app.on('ready', createMenu)
+app.on('ready', () => {
+    createWindow()
+    createMenu()
+    if(process.platform === 'win32') {
+        app.setAppUserModelId('Hoot Client')
+    }
+})
 
 app.on('window-all-closed', () => {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
         app.quit()
     }
 })
 
 app.on('activate', () => {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (win === null) {
         createWindow()
     }

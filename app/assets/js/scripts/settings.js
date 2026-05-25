@@ -620,7 +620,7 @@ function refreshAuthAccountSelected(uuid){
 
 const settingsCurrentMicrosoftAccounts = document.getElementById('settingsCurrentMicrosoftAccounts')
 const settingsCurrentMojangAccounts = document.getElementById('settingsCurrentMojangAccounts')
-
+const settingsCurrentOfflineAccounts = document.getElementById('settingsCurrentOfflineAccounts')
 /**
  * Add auth account elements for each one stored in the authentication database.
  */
@@ -631,13 +631,11 @@ function populateAuthAccounts(){
         return
     }
     const selectedUUID = ConfigManager.getSelectedAccount().uuid
-
     let microsoftAuthAccountStr = ''
     let mojangAuthAccountStr = ''
-
+    let offlineAuthAccountStr = ''
     authKeys.forEach((val) => {
         const acc = authAccounts[val]
-
         const accHtml = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
             <div class="settingsAuthAccountLeft">
                 <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://mc-heads.net/body/${acc.uuid}/60">
@@ -661,17 +659,17 @@ function populateAuthAccounts(){
                 </div>
             </div>
         </div>`
-
         if(acc.type === 'microsoft') {
             microsoftAuthAccountStr += accHtml
+        } else if(acc.type === 'offline' || acc.accessToken === 'offline') {
+            offlineAuthAccountStr += accHtml
         } else {
             mojangAuthAccountStr += accHtml
         }
-
     })
-
     settingsCurrentMicrosoftAccounts.innerHTML = microsoftAuthAccountStr
     settingsCurrentMojangAccounts.innerHTML = mojangAuthAccountStr
+    settingsCurrentOfflineAccounts.innerHTML = offlineAuthAccountStr
 }
 
 /**

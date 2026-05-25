@@ -1,4 +1,5 @@
 /* Github Code Highlighting. */
+@import "./hoot-theme-v2.css";
 @import "../../../node_modules/github-syntax-dark/lib/github-dark.css";
 
 /*******************************************************************************
@@ -1136,23 +1137,19 @@ body, button {
 }
 
 /* Div to add some space between nav items. */
-.settingsNavSpacer {
-    height: 25px;
-}
+
 
 /* Content container for the done button. */
 #settingsNavContentBottom {
-    position: absolute;
+    position: static;
     top: 65%;
 }
 
 /* Settings navigational divider. */
 .settingsNavDivider {
-    width: 75%;
     height: 1px;
     background: rgba(126, 126, 126, 0.57);
     margin-left: auto;
-    margin-bottom: 25px;
 }
 
 /* Settings done button styles. */
