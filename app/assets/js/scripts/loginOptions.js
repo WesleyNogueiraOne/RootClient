@@ -1,6 +1,5 @@
 const loginOptionsCancelContainer = document.getElementById('loginOptionCancelContainer')
 const loginOptionMicrosoft = document.getElementById('loginOptionMicrosoft')
-const loginOptionMojang = document.getElementById('loginOptionMojang')
 const loginOptionOffline = document.getElementById('loginOptionOffline')
 const loginOptionsCancelButton = document.getElementById('loginOptionCancelButton')
 const offlineLoginForm = document.getElementById('offlineLoginForm')
@@ -8,7 +7,31 @@ const offlineUsernameInput = document.getElementById('offlineUsernameInput')
 const offlineLoginConfirm = document.getElementById('offlineLoginConfirm')
 const offlineLoginBack = document.getElementById('offlineLoginBack')
 
+const loginOptionActions = document.querySelector('.loginOptionActions')
+
 let loginOptionsCancellable = false
+
+/**
+ * Return the offline form to its initial state and show the provider buttons.
+ * Must run whenever the loginOptions view is left, otherwise the view comes back
+ * stuck on the offline form with no way to reach the other providers.
+ */
+function resetOfflineLoginForm(){
+    offlineLoginForm.style.display = 'none'
+    loginOptionActions.style.display = 'block'
+    offlineUsernameInput.value = ''
+    offlineUsernameInput.style.borderColor = '#444'
+    offlineUsernameInput.placeholder = Lang.queryJS('loginOptions.offline.placeholder')
+    offlineLoginConfirm.disabled = false
+    offlineLoginConfirm.textContent = Lang.queryJS('loginOptions.offline.confirm')
+}
+
+function offlineLoginError(msg){
+    offlineUsernameInput.style.borderColor = 'red'
+    offlineUsernameInput.value = ''
+    offlineUsernameInput.placeholder = msg
+    offlineUsernameInput.focus()
+}
 
 let loginOptionsViewOnLoginSuccess
 let loginOptionsViewOnLoginCancel
@@ -33,59 +56,48 @@ loginOptionMicrosoft.onclick = (e) => {
     })
 }
 
-loginOptionMojang.onclick = (e) => {
-    switchView(getCurrentView(), VIEWS.login, 500, 500, () => {
-        loginViewOnSuccess = loginOptionsViewOnLoginSuccess
-        loginViewOnCancel = loginOptionsViewOnLoginCancel
-        loginCancelEnabled(true)
-    })
-}
-
 loginOptionOffline.onclick = (e) => {
-    // Esconde os botões e mostra o formulário offline
-    document.querySelector('.loginOptionActions').style.display = 'none'
+    loginOptionActions.style.display = 'none'
     offlineLoginForm.style.display = 'block'
     offlineUsernameInput.focus()
 }
 
 offlineLoginBack.onclick = (e) => {
-    // Volta para os botões
-    offlineLoginForm.style.display = 'none'
-    document.querySelector('.loginOptionActions').style.display = 'block'
-    offlineUsernameInput.value = ''
+    resetOfflineLoginForm()
 }
 
 offlineLoginConfirm.onclick = async (e) => {
     const username = offlineUsernameInput.value.trim()
 
-    // Validação do nickname
+    // Minecraft only accepts 3-16 chars of [a-zA-Z0-9_] as a name.
     if(username.length < 3) {
-        offlineUsernameInput.style.borderColor = 'red'
-        offlineUsernameInput.placeholder = 'Mínimo 3 caracteres!'
+        offlineLoginError(Lang.queryJS('loginOptions.offline.errorTooShort'))
+        return
+    }
+    if(username.length > 16) {
+        offlineLoginError(Lang.queryJS('loginOptions.offline.errorTooLong'))
         return
     }
     if(!/^[a-zA-Z0-9_]+$/.test(username)) {
-        offlineUsernameInput.style.borderColor = 'red'
-        offlineUsernameInput.placeholder = 'Apenas letras, números e _'
+        offlineLoginError(Lang.queryJS('loginOptions.offline.errorInvalidChars'))
         return
     }
 
     offlineUsernameInput.style.borderColor = '#444'
     offlineLoginConfirm.disabled = true
-    offlineLoginConfirm.textContent = 'Entrando...'
+    offlineLoginConfirm.textContent = Lang.queryJS('loginOptions.offline.loggingIn')
 
     try {
-        const authManager = require('./assets/js/authmanager')
-        const account = authManager.addOfflineAccount(username)
-
-        // Redireciona para a tela principal
-        switchView(getCurrentView(), loginOptionsViewOnLoginSuccess, 500, 500)
+        const account = AuthManager.addOfflineAccount(username)
+        updateSelectedAccount(account)
+        const nextView = loginOptionsViewOnLoginSuccess
+        resetOfflineLoginForm()
+        switchView(getCurrentView(), nextView, 500, 500)
     } catch(err) {
         console.error('Offline login error:', err)
         offlineLoginConfirm.disabled = false
-        offlineLoginConfirm.textContent = 'Entrar'
-        offlineUsernameInput.style.borderColor = 'red'
-        offlineUsernameInput.placeholder = 'Erro ao entrar, tente novamente'
+        offlineLoginConfirm.textContent = Lang.queryJS('loginOptions.offline.confirm')
+        offlineLoginError(Lang.queryJS('loginOptions.offline.errorGeneric'))
     }
 }
 
@@ -98,10 +110,7 @@ offlineUsernameInput.addEventListener('keydown', (e) => {
 
 loginOptionsCancelButton.onclick = (e) => {
     switchView(getCurrentView(), loginOptionsViewOnCancel, 500, 500, () => {
-        // Clear login values (Mojang login)
-        // No cleanup needed for Microsoft.
-        loginUsername.value = ''
-        loginPassword.value = ''
+        // No cleanup needed for Microsoft or offline login.
         if(loginOptionsViewCancelHandler != null){
             loginOptionsViewCancelHandler()
             loginOptionsViewCancelHandler = null

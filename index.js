@@ -12,6 +12,7 @@ const semver                            = require('semver')
 const { pathToFileURL }                 = require('url')
 const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
 const LangLoader                        = require('./app/assets/js/langloader')
+const RootAPI                           = require('./app/assets/js/rootapi')
 
 // Setup Lang
 LangLoader.setupLanguage()
@@ -218,8 +219,11 @@ let win
 
 function createWindow() {
     win = new BrowserWindow({
-        width: 980,
-        height: 552,
+        width: 1280,
+        height: 720,
+        minWidth: 1000,
+        minHeight: 640,
+        center: true,
         icon: getPlatformIcon('logo'),
         frame: false,
         webPreferences: {
@@ -227,7 +231,7 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: false
         },
-        backgroundColor: '#171614'
+        backgroundColor: '#0b0c10'
     })
     remoteMain.enable(win.webContents)
 
@@ -238,12 +242,8 @@ function createWindow() {
     Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
 
     win.loadURL(pathToFileURL(path.join(__dirname, 'app', 'app.ejs')).toString())
-    setTimeout(() => {
-        win.webContents.openDevTools({ mode: 'detach' })
-    }, 3000)
 
     win.removeMenu()
-    win.webContents.openDevTools()
     win.resizable = true
 
     win.on('closed', () => {
@@ -325,8 +325,12 @@ app.on('ready', () => {
     createWindow()
     createMenu()
     if(process.platform === 'win32') {
-        app.setAppUserModelId('Hoot Client')
+        app.setAppUserModelId('Root Client')
     }
+    // Integração site: registra os handlers IPC do Root Client.
+    try { RootAPI.register(ipcMain) } catch (e) { console.error('[RootAPI] register falhou', e) }
+    // Deep link rootclient:// (fecha o loop do vínculo).
+    try { app.setAsDefaultProtocolClient('rootclient') } catch (e) { /* ignore */ }
 })
 
 app.on('window-all-closed', () => {

@@ -7,7 +7,7 @@ const logger = LoggerUtil.getLogger('ConfigManager')
 
 const sysRoot = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Application Support' : process.env.HOME)
 
-const dataPath = path.join(sysRoot, '.hootclient')
+const dataPath = path.join(sysRoot, '.rootclient')
 
 const launcherDir = require('@electron/remote').app.getPath('userData')
 
@@ -345,6 +345,28 @@ exports.addMojangAuthAccount = function(uuid, accessToken, username, displayName
         username: username.trim(),
         uuid: uuid.trim(),
         displayName: displayName.trim()
+    }
+    return config.authenticationDatabase[uuid]
+}
+
+/**
+ * Adds an offline account to the database to be stored. Offline accounts are not
+ * authenticated against any server, the uuid must be derived from the username the
+ * same way the Minecraft server derives it in offline mode.
+ *
+ * @param {string} uuid The offline uuid derived from the username.
+ * @param {string} username The in game name of the account.
+ *
+ * @returns {Object} The account object created by this action.
+ */
+exports.addOfflineAuthAccount = function(uuid, username){
+    config.selectedAccount = uuid
+    config.authenticationDatabase[uuid] = {
+        type: 'offline',
+        accessToken: 'offline',
+        username: username.trim(),
+        uuid: uuid.trim(),
+        displayName: username.trim()
     }
     return config.authenticationDatabase[uuid]
 }

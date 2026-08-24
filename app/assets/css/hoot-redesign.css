@@ -1,0 +1,263 @@
+/* ═══════════════════════════════════════════════════════════════
+   ROOT CLIENT — REDESIGN v5 (layout imersivo)
+   Fundo cinematográfico + marca + herói + trilho de notícias + dock
+   Carregado depois do hoot-theme-v2.css (paleta/tokens vêm de lá).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* NÃO forçar display aqui — o uibinder controla a exibição das views.
+   O #landingContainer já é position:relative/overflow:hidden pela launcher.css;
+   o #rcStage é absolute inset:0 e preenche tudo. */
+
+@keyframes rcPulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
+
+/* ── Marca (canto sup. esquerdo) */
+#rcBrand { position:absolute; top:16px; left:18px; z-index:8; display:flex; align-items:center; gap:11px; -webkit-app-region:no-drag; }
+#image_seal_container { position:relative; }
+#image_seal { width:44px; height:44px; border-radius:0; object-fit:contain; display:block; filter:drop-shadow(0 0 10px rgba(231,178,62,.35)); cursor:pointer; transition:filter .25s, transform .16s; }
+#image_seal:hover { filter:drop-shadow(0 0 16px rgba(231,178,62,.6)); transform:scale(1.05); }
+#updateAvailableTooltip { position:absolute; top:46px; left:0; background:var(--purple-panel); backdrop-filter:var(--glass-blur); border:1px solid var(--line); color:var(--gold-shine); font-size:11px; padding:5px 9px; border-radius:8px; white-space:nowrap; display:none; }
+#rcBrandText { display:flex; flex-direction:column; line-height:1.2; }
+.rc-brand-name { font-family:'Cinzel',serif; font-size:13px; letter-spacing:3px; color:var(--gold); }
+.rc-brand-sub { font-size:10.5px; color:var(--muted); letter-spacing:1px; }
+
+/* ── Redes sociais (rail esquerdo) */
+#rcSocial { position:absolute; left:20px; bottom:122px; z-index:7; display:flex; flex-direction:column; gap:9px; }
+#rcSocial .hootSocialBtn { width:38px; height:38px; border-radius:11px; background:var(--purple-panel); backdrop-filter:var(--glass-blur); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; transition:transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s; }
+#rcSocial .hootSocialBtn:hover { border-color:rgba(231,178,62,.5) !important; transform:translateX(3px); box-shadow:0 0 16px rgba(231,178,62,.15); opacity:1 !important; }
+#rcSocial .mediaSVG { width:16px; height:16px; fill:var(--muted); transition:fill .2s; }
+#rcSocial .hootSocialBtn:hover .mediaSVG { fill:var(--gold-shine); }
+
+/* ── Palco (grid) */
+#rcStage {
+    position:absolute; inset:0; z-index:5;
+    display:grid;
+    grid-template-columns: 1fr 350px;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: "top top" "hero news" "dock dock";
+    gap:16px;
+    padding:18px 24px 20px 74px;
+}
+
+/* Conta (topo direito) */
+#rcTopbar { grid-area:top; display:flex; justify-content:flex-end; align-items:flex-start; -webkit-app-region:no-drag; }
+.rc-account { display:flex; align-items:center; gap:10px; background:var(--purple-panel); backdrop-filter:var(--glass-blur); border:1px solid var(--line); border-radius:999px; padding:6px 8px 6px 16px; cursor:pointer; transition:border-color .22s, box-shadow .22s, transform .16s; }
+.rc-account:hover { border-color:rgba(231,178,62,.42); box-shadow:0 0 22px rgba(231,178,62,.12); }
+.rc-account:active { transform:translateY(1px); }
+.rc-account-who { text-align:right; line-height:1.25; }
+.rc-account-who b { font-size:13px; color:var(--parchment); font-weight:600; }
+.rc-account-tag { display:block; font-size:10.5px; color:var(--arcane); }
+.rc-avatar { position:relative; width:36px; height:36px; border-radius:50%; overflow:hidden; background:linear-gradient(135deg,#2a3140,#161922); border:1px solid rgba(231,178,62,.45); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.rc-avatar img, .rc-avatar canvas { width:100%; height:100%; object-fit:cover; }
+#avatarOverlay { position:absolute; inset:0; width:100%; height:100%; background:rgba(0,0,0,.55); color:var(--gold-shine); border:none; font-size:8px; letter-spacing:.5px; cursor:pointer; opacity:0; transition:opacity .2s; }
+.rc-avatar:hover #avatarOverlay { opacity:1; }
+
+/* Herói */
+#rcHero { grid-area:hero; align-self:end; max-width:560px; animation: rcHeroIn .6s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes rcHeroIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+.rc-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:12px; letter-spacing:2px; color:var(--arcane); text-transform:uppercase; margin-bottom:10px; text-shadow:0 0 10px var(--arcane-glow); }
+.rc-dot { width:8px; height:8px; border-radius:50%; background:var(--arcane); box-shadow:0 0 10px var(--arcane); animation:rcPulse 2s ease-in-out infinite; }
+.rc-hero-title { font-family:'Cinzel',serif; font-size:46px; font-weight:900; letter-spacing:2px; color:var(--gold-shine); text-shadow:0 4px 30px rgba(231,178,62,.3); line-height:1; margin:0; }
+.rc-hero-desc { color:#c7ccd8; margin-top:12px; font-size:14.5px; line-height:1.62; max-width:480px; }
+
+/* ── Trilho de notícias (glass) */
+#rcNews { grid-area:news; display:flex; flex-direction:column; gap:12px; min-height:0; }
+#rcNews .news-tabs { display:flex; gap:6px; background:var(--purple-panel); backdrop-filter:var(--glass-blur); border:1px solid var(--line); border-radius:12px; padding:5px; }
+#rcNews .news-tab { flex:1; background:none; border:none; color:var(--muted); font-family:'Cinzel',serif; font-size:10.5px; letter-spacing:1px; padding:9px 6px; border-radius:8px; cursor:pointer; transition:background .2s, color .2s; }
+#rcNews .news-tab .panel-gem { font-size:6px; opacity:.6; margin:0 3px; }
+#rcNews .news-tab.active { background:rgba(231,178,62,.14); color:var(--gold-shine); }
+#rcNews .news-tab:hover:not(.active) { color:var(--parchment); background:rgba(255,255,255,.04); }
+#rcNews .news-list { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding-right:3px; }
+#rcNews .hoot-news-placeholder { color:var(--muted); font-size:13px; text-align:center; padding:24px 10px; }
+
+/* Cards de notícia (renderizados por loadHootNews) */
+#rcNews .news-item { background:var(--purple-panel); backdrop-filter:var(--glass-blur); border:1px solid var(--line); border-radius:14px; overflow:hidden; cursor:pointer; transition:transform .26s cubic-bezier(.2,.8,.2,1), border-color .26s, box-shadow .26s; }
+#rcNews .news-item:hover { transform:translateY(-3px); border-color:rgba(231,178,62,.4); box-shadow:0 16px 40px rgba(0,0,0,.5); }
+#rcNews .news-item-image { width:100%; height:104px; object-fit:cover; display:block; }
+#rcNews .news-video-thumb { position:relative; height:104px; overflow:hidden; }
+#rcNews .news-video-thumb img { width:100%; height:100%; object-fit:cover; }
+#rcNews .news-item-title { font-family:'Cinzel',serif; font-size:14px; color:var(--gold); margin:0; padding:12px 14px 0; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+#rcNews .news-item-desc { font-size:12.5px; color:#b6bccb; line-height:1.5; padding:6px 14px 0; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
+#rcNews .news-item-date { font-size:11px; color:var(--muted); padding:8px 14px 12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ── Dock inferior */
+#rcDock { grid-area:dock; display:flex; align-items:center; gap:16px; background:rgba(20,23,31,.82); backdrop-filter:blur(18px); border:1px solid var(--line-strong); border-radius:18px; padding:14px 20px; box-shadow:0 20px 50px rgba(0,0,0,.5); animation: rcDockIn .5s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes rcDockIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+.rc-dock-info { display:flex; flex-direction:column; gap:4px; min-width:200px; }
+.rc-server-name { background:none; border:none; padding:0; text-align:left; font-family:'Cinzel',serif; font-size:16px; color:var(--parchment); letter-spacing:.5px; cursor:pointer; transition:color .2s; }
+.rc-server-name:hover { color:var(--gold-shine); }
+.rc-server-status { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+.rc-server-status .status-dot { width:8px; height:8px; border-radius:50%; background:var(--arcane); box-shadow:0 0 8px var(--arcane); }
+.rc-server-status .status-dot.offline { background:#8a5cf6; box-shadow:none; }
+.rc-sep { opacity:.5; }
+.rc-mojang { position:relative; display:inline-flex; align-items:center; gap:6px; }
+#mojang_status_icon { color:var(--arcane); cursor:default; }
+.rc-dock-spacer { flex:1; }
+
+.rc-icon-btn { width:46px; height:46px; border-radius:12px; background:rgba(255,255,255,.04); border:1px solid var(--line-strong); color:var(--parchment); cursor:pointer; transition:border-color .2s, background .2s, box-shadow .2s, transform .16s; display:flex; align-items:center; justify-content:center; }
+.rc-icon-btn svg { width:22px; height:22px; }
+.rc-icon-btn:hover { border-color:rgba(231,178,62,.5); color:var(--gold-shine); background:rgba(231,178,62,.08); box-shadow:0 0 18px rgba(231,178,62,.15); }
+
+/* Slot do PLAY / progresso */
+#rcDock #launch_content.rc-launch-slot { display:inline-flex; align-items:center; padding:0; margin:0; background:none; border:none; }
+#rcDock #launch_button.rc-play {
+    position:relative; overflow:hidden; display:flex; align-items:center; gap:11px;
+    font-family:'Cinzel',serif; font-weight:700; letter-spacing:3px; font-size:18px; color:#241a06;
+    padding:15px 48px; border:none; border-radius:14px; cursor:pointer;
+    background:linear-gradient(180deg,var(--gold-light),var(--gold) 60%,var(--gold-dark));
+    box-shadow:0 10px 28px rgba(231,178,62,.4), inset 0 1px 0 rgba(255,255,255,.55), 0 0 0 1px rgba(255,220,130,.5);
+    transition:transform .16s cubic-bezier(.2,.8,.2,1), box-shadow .25s, filter .2s;
+    text-transform:uppercase;
+}
+#rcDock #launch_button.rc-play:hover { filter:brightness(1.05); transform:translateY(-2px); box-shadow:0 16px 40px rgba(231,178,62,.6), inset 0 1px 0 rgba(255,255,255,.6), 0 0 0 1px rgba(255,220,130,.75); }
+#rcDock #launch_button.rc-play:active { transform:translateY(1px); box-shadow:0 6px 16px rgba(231,178,62,.4), inset 0 1px 0 rgba(255,255,255,.4); }
+#rcDock #launch_button.rc-play:disabled { filter:grayscale(.5) brightness(.7); cursor:not-allowed; box-shadow:none; }
+#rcDock .rc-play .launch-icon { font-size:15px; }
+.rc-play-shine { position:absolute; top:0; left:-70%; width:45%; height:100%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent); transform:skewX(-20deg); animation:playSweep 3.6s ease-in-out infinite; pointer-events:none; }
+
+/* Progresso (substitui o PLAY durante o launch) */
+#rcDock #launch_details.rc-progress { flex-direction:column; gap:7px; min-width:300px; max-width:440px; align-items:stretch; }
+/* Texto de status pode ser longo — deixa quebrar linha em vez de cortar */
+#rcDock #launch_details_text, #rcDock #launch_details.rc-progress .progress-text {
+    font-size:12px; color:var(--parchment);
+    white-space:normal; overflow:visible; text-overflow:clip; line-height:1.35;
+}
+/* Barra de progresso baseada em div (render garantido) */
+#rcDock #launch_progress.rc-bar {
+    width:100%; height:9px; border:none; border-radius:99px;
+    background:rgba(255,255,255,.12); overflow:hidden; display:block; padding:0;
+}
+#rcDock #launch_progress_fill {
+    height:100%; width:0%; border-radius:99px; display:block;
+    background:linear-gradient(90deg, var(--amber), var(--gold-light));
+    box-shadow:0 0 10px rgba(231,178,62,.6);
+    transition:width .35s ease;
+}
+#rcDock .progress-percent, #rcDock #launch_progress_label { font-size:11px; color:var(--gold-shine); text-align:right; letter-spacing:1px; font-family:'Cinzel',serif; }
+.rc-ver { font-size:11px; color:var(--muted); letter-spacing:1px; align-self:center; }
+
+/* Responsivo — janelas menores */
+@media (max-width: 1000px) {
+    #rcStage { grid-template-columns: 1fr 290px; padding-left:70px; }
+    .rc-hero-title { font-size:38px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONFIGURAÇÕES — mesmo tema da home (glass + moderno)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Fundo dark com brilhos, igual à home */
+#settingsContainer {
+    background:
+        radial-gradient(1100px 560px at 82% -12%, rgba(231,178,62,.08), transparent 58%),
+        radial-gradient(820px 460px at 4% 108%, rgba(90,210,189,.06), transparent 60%),
+        var(--purple-abyss) !important;
+}
+
+/* Nav lateral como painel de vidro */
+#settingsContainerLeft {
+    background: var(--purple-panel) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-right: 1px solid var(--line) !important;
+    padding-left: 22px !important;
+    padding-right: 18px !important;
+    min-width: 210px !important;
+}
+
+/* Respiro entre a divisão e o conteúdo (não colar no divisor) */
+#settingsContainerRight { padding-left: 38px !important; padding-right: 14px !important; }
+.settingsTab { padding-right: 26px !important; padding-top: 26px !important; box-sizing: border-box !important; }
+.settingsTabHeader { margin-bottom: 18px !important; }
+
+/* Nav items — Inter, legível, moderno */
+.settingsNavItem {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+    letter-spacing: .3px !important;
+    text-transform: none !important;
+    font-weight: 500 !important;
+    padding: 10px 14px !important;
+    color: var(--purple-text) !important;
+}
+.settingsNavItem:hover { color: var(--parchment) !important; background: rgba(255,255,255,.04) !important; border-color: transparent !important; }
+.settingsNavItem[selected] { color: var(--gold-shine) !important; background: rgba(231,178,62,.10) !important; border-color: rgba(231,178,62,.25) !important; }
+
+#settingsNavHeaderText { font-family:'Cinzel',serif !important; font-size:18px !important; }
+
+/* Headers das abas */
+.settingsTabHeaderText { font-family:'Cinzel',serif !important; font-size:20px !important; color:var(--gold) !important; }
+.settingsTabHeaderDesc { font-family:'Inter',sans-serif !important; font-style:normal !important; color:var(--muted) !important; font-size:13px !important; }
+
+/* Inputs texto/número — vidro escuro, foco dourado */
+#settingsContainer input[type=number],
+#settingsContainer input[type=text] {
+    background: rgba(255,255,255,.04) !important;
+    border: 1px solid var(--line-strong) !important;
+    border-radius: 8px !important;
+    color: var(--text) !important;
+    font-family: 'Inter', sans-serif !important;
+    padding: 9px 12px !important;
+    transition: border-color .2s, box-shadow .2s !important;
+}
+#settingsContainer input[type=number]:focus,
+#settingsContainer input[type=text]:focus {
+    border-color: rgba(231,178,62,.6) !important;
+    box-shadow: 0 0 0 2px rgba(231,178,62,.15) !important;
+    outline: none !important;
+}
+
+/* Dropdown customizado */
+.settingsSelectSelected {
+    background: rgba(255,255,255,.04) !important;
+    border: 1px solid var(--line-strong) !important;
+    border-radius: 8px !important;
+    color: var(--text) !important;
+    font-family: 'Inter', sans-serif !important;
+}
+.settingsSelectSelected:hover { border-color: rgba(231,178,62,.5) !important; }
+.settingsSelectOptions { background: rgba(20,23,31,.98) !important; border:1px solid var(--line-strong) !important; border-radius:8px !important; }
+.settingsSelectOptions li:hover { background: rgba(231,178,62,.12) !important; color: var(--gold-shine) !important; }
+
+/* Slider (RAM etc) — pega dourado */
+.rangeSliderTrack { background: linear-gradient(180deg, var(--gold-light), var(--gold-dark)) !important; box-shadow: 0 0 8px rgba(231,178,62,.5) !important; }
+
+/* Cards de conta — vidro coeso */
+.settingsAuthAccount { backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
+.settingsAuthAccount:hover { border-color: rgba(231,178,62,.35) !important; box-shadow: 0 8px 26px rgba(0,0,0,.4) !important; }
+
+/* Logo (wordmark) na aba Sobre */
+#settingsAboutLogo { max-width: 220px !important; width:auto !important; height:auto !important; border-radius:0 !important; filter: drop-shadow(0 0 16px rgba(231,178,62,.25)); }
+
+/* Wordmark na tela de boas-vindas (sem círculo/borda que cortavam) */
+#welcomeImageSeal {
+    border-radius: 0 !important;
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 300px !important;
+    max-height: 180px !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 0 22px rgba(231,178,62,.3));
+}
+
+/* Textos de valor/descrição em Inter */
+.settingsFieldDescription, .settingsModDescription, .settingsSelectComplimentary, .settingsAuthAccountDetailValue { font-family:'Inter',sans-serif !important; }
+
+/* Press nos botões de settings */
+#settingsContainer button:active:not(.settingsNavItem) { transform: translateY(1px); }
+
+/* ═══════════════════════════════ TELA DE LOADING (marca Root) */
+#loadingContainer {
+    background: radial-gradient(600px 420px at 50% 42%, rgba(231,178,62,.06), transparent 60%), var(--purple-abyss) !important;
+}
+/* Coruja no centro, sem círculo azul/borda antiga */
+#loadCenterImage {
+    width: 118px !important; height: 118px !important;
+    border: none !important; border-radius: 0 !important; box-shadow: none !important;
+    object-fit: contain !important; position: absolute !important; z-index: 401 !important;
+    filter: drop-shadow(0 0 18px rgba(231,178,62,.4));
+}
+/* Anel dourado girando em volta */
+#loadSpinnerImage { width: 232px !important; height: 232px !important; z-index: 400 !important; }

@@ -1,178 +1,144 @@
 <div id="landingContainer" style="display: none;">
 
-    <div id="hootSidebar">
-        <div class="corner-tl"></div>
-        <div class="corner-tr"></div>
-        <div class="corner-bl"></div>
-        <div class="corner-br"></div>
-
-        <div id="hootLogoArea">
-            <div id="image_seal_container">
-                <img id="image_seal" src="assets/images/logo.png"/>
-                <div id="updateAvailableTooltip"><%- lang('landing.updateAvailableTooltip') %></div>
-            </div>
-            <div id="hootTitle">HOOT CLIENT</div>
-            <div id="hootTitleDivider">
-                <span class="divider-line"></span>
-                <span class="divider-gem">◆</span>
-                <span class="divider-line"></span>
-            </div>
+    <!-- ══════════ Marca (canto superior esquerdo) ══════════ -->
+    <div id="rcBrand">
+        <div id="image_seal_container">
+            <img id="image_seal" src="assets/images/logo.png"/>
+            <div id="updateAvailableTooltip"><%- lang('landing.updateAvailableTooltip') %></div>
         </div>
-
-        <nav id="hootNav">
-            <button id="hootPlayBtn" onclick="document.getElementById('launch_button').click()">
-                <span class="nav-icon">▶</span>
-                <span class="nav-text">JOGAR</span>
-            </button>
-            <button class="hootNavItem" id="settingsMediaButton">
-                <span class="nav-icon">⚙</span>
-                <span class="nav-text">CONFIGURAÇÕES</span>
-            </button>
-        </nav>
-        <span id="user_text" style="display:none;"><%- lang('landing.usernamePlaceholder') %></span>
-        <div class="sidebar-divider">
-            <span class="divider-line"></span>
-            <span class="divider-gem">◆</span>
-            <span class="divider-line"></span>
+        <div id="rcBrandText">
+            <span class="rc-brand-name">ROOT CLIENT</span>
+            <span class="rc-brand-sub">Root RP</span>
         </div>
-
-        <div id="sidebarGear">
-            <div class="gear-outer">
-                <div class="gear-tooth t1"></div><div class="gear-tooth t2"></div>
-                <div class="gear-tooth t3"></div><div class="gear-tooth t4"></div>
-                <div class="gear-tooth t5"></div><div class="gear-tooth t6"></div>
-                <div class="gear-tooth t7"></div><div class="gear-tooth t8"></div>
-                <div class="gear-inner"><div class="gear-core"></div></div>
-            </div>
-        </div>
-
-        <div id="hootVersion">v2.2.1</div>
-
-        <div id="hootSocialIcons">
-    <a href="#" class="mediaURL hootSocialBtn" title="Discord" style="pointer-events: none; opacity: 0.3;">
-        <svg class="mediaSVG" viewBox="35.34 34.3575 70.68 68.71500">
-            <path d="M81.23,78.48a6.14,6.14,0,1,1,6.14-6.14,6.14,6.14,0,0,1-6.14,6.14M60,78.48a6.14,6.14,0,1,1,6.14-6.14A6.14,6.14,0,0,1,60,78.48M104.41,73c-.92-7.7-8.24-22.9-8.24-22.9A43,43,0,0,0,88,45.59a17.88,17.88,0,0,0-8.38-1.27l-.13,1.06a23.52,23.52,0,0,1,5.8,1.95,87.59,87.59,0,0,1,8.17,4.87s-10.32-5.63-22.27-5.63a51.32,51.32,0,0,0-23.2,5.63,87.84,87.84,0,0,1,8.17-4.87,23.57,23.57,0,0,1,5.8-1.95l-.13-1.06a17.88,17.88,0,0,0-8.38,1.27,42.84,42.84,0,0,0-8.21,4.56S37.87,65.35,37,73s-.37,11.54-.37,11.54,4.22,5.68,9.9,7.14,7.7,1.47,7.7,1.47l3.75-4.68a21.22,21.22,0,0,1-4.65-2A24.47,24.47,0,0,1,47.93,82S61.16,88.4,70.68,88.4c10,0,22.75-6.44,22.75-6.44a24.56,24.56,0,0,1-5.35,4.56,21.22,21.22,0,0,1-4.65,2l3.75,4.68s2,0,7.7-1.47,9.89-7.14,9.89-7.14.55-3.85-.37-11.54"/>
-        </svg>
-    </a>
-    <a href="#" class="mediaURL hootSocialBtn" title="Instagram" style="pointer-events: none; opacity: 0.3;">
-        <svg class="mediaSVG" viewBox="0 0 24 24">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-        </svg>
-    </a>
-    <a href="#" class="mediaURL hootSocialBtn" title="TikTok" style="pointer-events: none; opacity: 0.3;">
-        <svg class="mediaSVG" viewBox="0 0 24 24">
-            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
-        </svg>
-    </a>
-    <a href="#" class="mediaURL hootSocialBtn" title="YouTube" style="pointer-events: none; opacity: 0.3;">
-        <svg class="mediaSVG" viewBox="0 0 24 24">
-            <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
-        </svg>
-    </a>
-</div>
     </div>
 
-    <div id="hootMain" class="dashboard-layout">
-        
-        <div class="hoot-panel welcome-panel">
-            <h2 class="welcome-title">Bem-vindo ao HootRP</h2>
-            <div class="welcome-info">
-                <p>Servidor: <span class="highlight">localhost:25565</span></p>
-                <p class="status-text">
+    <!-- ══════════ Redes sociais (rail lateral) ══════════ -->
+    <div id="rcSocial">
+        <a href="#" class="mediaURL hootSocialBtn" title="Discord" style="pointer-events: none; opacity: 0.35;">
+            <svg class="mediaSVG" viewBox="35.34 34.3575 70.68 68.71500">
+                <path d="M81.23,78.48a6.14,6.14,0,1,1,6.14-6.14,6.14,6.14,0,0,1-6.14,6.14M60,78.48a6.14,6.14,0,1,1,6.14-6.14A6.14,6.14,0,0,1,60,78.48M104.41,73c-.92-7.7-8.24-22.9-8.24-22.9A43,43,0,0,0,88,45.59a17.88,17.88,0,0,0-8.38-1.27l-.13,1.06a23.52,23.52,0,0,1,5.8,1.95,87.59,87.59,0,0,1,8.17,4.87s-10.32-5.63-22.27-5.63a51.32,51.32,0,0,0-23.2,5.63,87.84,87.84,0,0,1,8.17-4.87,23.57,23.57,0,0,1,5.8-1.95l-.13-1.06a17.88,17.88,0,0,0-8.38,1.27,42.84,42.84,0,0,0-8.21,4.56S37.87,65.35,37,73s-.37,11.54-.37,11.54,4.22,5.68,9.9,7.14,7.7,1.47,7.7,1.47l3.75-4.68a21.22,21.22,0,0,1-4.65-2A24.47,24.47,0,0,1,47.93,82S61.16,88.4,70.68,88.4c10,0,22.75-6.44,22.75-6.44a24.56,24.56,0,0,1-5.35,4.56,21.22,21.22,0,0,1-4.65,2l3.75,4.68s2,0,7.7-1.47,9.89-7.14,9.89-7.14.55-3.85-.37-11.54"/>
+            </svg>
+        </a>
+        <a href="#" class="mediaURL hootSocialBtn" title="YouTube" style="pointer-events: none; opacity: 0.35;">
+            <svg class="mediaSVG" viewBox="0 0 24 24">
+                <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
+            </svg>
+        </a>
+        <a href="#" class="mediaURL hootSocialBtn" title="Instagram" style="pointer-events: none; opacity: 0.35;">
+            <svg class="mediaSVG" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+        </a>
+        <a href="#" class="mediaURL hootSocialBtn" title="TikTok" style="pointer-events: none; opacity: 0.35;">
+            <svg class="mediaSVG" viewBox="0 0 24 24">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+            </svg>
+        </a>
+    </div>
+
+    <!-- ══════════ Palco principal ══════════ -->
+    <div id="rcStage">
+
+        <!-- Conta (canto superior direito) -->
+        <div id="rcTopbar">
+            <div id="user_content" class="rc-account" title="<%- lang('landing.usernameEditButton') %>">
+                <div class="rc-account-who">
+                    <b id="user_text_main"><%- lang('landing.usernamePlaceholder') %></b>
+                    <small class="rc-account-tag">Microsoft ✓</small>
+                </div>
+                <div id="avatarContainer" class="rc-avatar">
+                    <button id="avatarOverlay"><%- lang('landing.usernameEditButton') %></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Herói -->
+        <div id="rcHero">
+            <div class="rc-eyebrow"><span class="rc-dot"></span> Root RP · Continente de Noctumbria</div>
+            <h1 class="rc-hero-title">NOCTUMBRIA</h1>
+            <p class="rc-hero-desc">Um continente onde magia arcana e engenho a vapor se entrelaçam. Escolha sua origem, domine sua arte e deixe sua marca nas crônicas.</p>
+        </div>
+
+        <!-- Trilho de notícias -->
+        <div id="rcNews">
+            <div class="news-tabs">
+                <button class="news-tab active" data-tab="news"><span class="panel-gem">◆</span> NOVIDADES</button>
+                <button class="news-tab" data-tab="journal"><span class="panel-gem">◆</span> JORNAL</button>
+                <button class="news-tab" data-tab="tickets"><span class="panel-gem">◆</span> TICKETS <span id="rcTicketsBadge" style="display:none;margin-left:4px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#f87171;color:#fff;font-size:10px;line-height:16px;text-align:center;"></span></button>
+            </div>
+            <div id="hootNewsList" class="news-list" data-content="news">
+                <div class="hoot-news-placeholder">Carregando notícias...</div>
+            </div>
+            <div id="hootJournalList" class="news-list" data-content="journal" style="display:none;">
+                <div class="hoot-news-placeholder">Carregando jornal...</div>
+            </div>
+            <div id="rcTicketsList" class="news-list" data-content="tickets" style="display:none;flex-direction:column;">
+                <div class="hoot-news-placeholder">Carregando tickets...</div>
+            </div>
+        </div>
+
+        <!-- Dock inferior -->
+        <div id="rcDock">
+            <div class="rc-dock-info">
+                <button id="server_selection_button" class="rc-server-name"><%- lang('landing.launchButtonPlaceholder') %></button>
+                <div class="rc-server-status">
                     <span class="status-dot offline"></span>
-                    <span id="landingPlayerLabel"><%- lang('landing.serverStatus') %></span> |
+                    <span id="landingPlayerLabel"><%- lang('landing.serverStatus') %></span>
+                    <span class="rc-sep">·</span>
                     <span id="player_count"><%- lang('landing.serverStatusPlaceholder') %></span>
-                </p>
-            </div>
-        </div>
-
-        <div class="dashboard-body">
-            
-            <div id="hootNewsPanel" class="hoot-panel news-panel">
-    <div class="news-tabs">
-        <button class="news-tab active" data-tab="news">
-            <span class="panel-gem">◆</span> ÚLTIMAS NOVIDADES <span class="panel-gem">◆</span>
-        </button>
-        <button class="news-tab" data-tab="journal">
-            <span class="panel-gem">◆</span> JORNAL DE NOTUMBRIA <span class="panel-gem">◆</span>
-        </button>
-    </div>
-    <div id="hootNewsList" class="news-list" data-content="news">
-        <div class="hoot-news-placeholder">Carregando notícias...</div>
-    </div>
-    <div id="hootJournalList" class="news-list" data-content="journal" style="display:none;">
-        <div class="hoot-news-placeholder">Carregando jornal...</div>
-    </div>
-</div>
-
-            <div class="side-panels">
-                
-                <div id="hootPlayerArea" class="hoot-panel char-panel">
-                    <h3 class="panel-header">PERSONAGEM</h3>
-                    <div id="user_content" class="char-info">
-                        <div id="avatarContainer" class="char-avatar">
-                            <button id="avatarOverlay"><%- lang('landing.usernameEditButton') %></button>
-                        </div>
-                        <div class="char-details">
-                            <h4 id="user_text_main"><%- lang('landing.usernamePlaceholder') %></h4>
-                            <p>Aventureiro</p>
-                            <span class="msa-check">MSA ✓</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="hootServerPanel" class="hoot-panel sys-panel">
-                    <h3 class="panel-header">SISTEMA</h3>
-                    <div class="sys-info">
-                        <div class="hoot-status-row">
-                            <span class="status-label">MOJANG</span>
-                            <div id="mojangStatusWrapper">
-                                <span id="mojang_status_icon">&#8226;</span>
-                                <div id="mojangStatusTooltip">
-                                    <div id="mojangStatusTooltipTitle"><%- lang('landing.mojangStatusTooltipTitle') %></div>
-                                    <div id="mojangStatusEssentialContainer"></div>
-                                    <div id="mojangStatusNEContainer">
-                                        <div class="mojangStatusNEBar"></div>
-                                        <div id="mojangStatusNETitle"><%- lang('landing.mojangStatusNETitle') %></div>
-                                        <div class="mojangStatusNEBar"></div>
-                                    </div>
-                                    <div id="mojangStatusNonEssentialContainer"></div>
-                                </div>
+                    <span id="mojangStatusWrapper" class="rc-mojang">
+                        <span class="rc-sep">·</span>
+                        <span id="mojang_status_icon">&#8226;</span>
+                        <div id="mojangStatusTooltip">
+                            <div id="mojangStatusTooltipTitle"><%- lang('landing.mojangStatusTooltipTitle') %></div>
+                            <div id="mojangStatusEssentialContainer"></div>
+                            <div id="mojangStatusNEContainer">
+                                <div class="mojangStatusNEBar"></div>
+                                <div id="mojangStatusNETitle"><%- lang('landing.mojangStatusNETitle') %></div>
+                                <div class="mojangStatusNEBar"></div>
                             </div>
+                            <div id="mojangStatusNonEssentialContainer"></div>
                         </div>
-                        <p style="margin-top: 8px;"><strong>Java</strong><br><span id="sysJavaInfo">Eclipse Adoptium 21</span></p>
-                        <p><strong>RAM</strong><br><span id="sysRamInfo">4 GB alocado</span></p>
-                    </div>
+                    </span>
                 </div>
-
             </div>
-        </div>
 
-        <div id="hootLaunchArea" class="dashboard-footer">
-            <div id="launch_content" class="launch-content-wrapper">
-                <button id="server_selection_button" class="bot_label"><%- lang('landing.launchButtonPlaceholder') %></button>
-                <button id="launch_button">
+            <div class="rc-dock-spacer"></div>
+
+            <button class="rc-icon-btn" id="settingsMediaButton" title="Configurações">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.6 7.6 0 000-2l2-1.6-2-3.4-2.4 1a7.3 7.3 0 00-1.7-1l-.4-2.5h-4l-.4 2.5a7.3 7.3 0 00-1.7 1l-2.4-1-2 3.4L4.6 11a7.6 7.6 0 000 2l-2 1.6 2 3.4 2.4-1a7.3 7.3 0 001.7 1l.4 2.5h4l.4-2.5a7.3 7.3 0 001.7-1l2.4 1 2-3.4-2-1.6zM12 15.5A3.5 3.5 0 1112 8.5a3.5 3.5 0 010 7z"/></svg>
+            </button>
+
+            <div id="launch_content" class="rc-launch-slot">
+                <button id="launch_button" class="rc-play">
+                    <span class="rc-play-shine"></span>
                     <span class="launch-icon">▶</span>
                     <%- lang('landing.launchButton') %>
                 </button>
             </div>
-            
-            <div id="launch_details" class="launch-progress-area" style="display: none;">
+
+            <div id="launch_details" class="rc-progress" style="display: none;">
                 <span id="launch_details_text" class="progress-text"><%- lang('landing.launchDetails') %></span>
-                <progress id="launch_progress" value="22" max="100" class="progress-bar-container"></progress>
+                <div id="launch_progress" class="rc-bar"><div id="launch_progress_fill"></div></div>
                 <span id="launch_progress_label" class="progress-percent">0%</span>
             </div>
+
+            <div id="hootVersion" class="rc-ver">v1.0.2</div>
         </div>
 
-        <button id="newsButton" style="display:none;">
-            <div id="newsButtonAlert" style="display: none;"></div>
-            <span id="newsButtonText"><%- lang('landing.newsButton') %></span>
-        </button>
-        <div id="lower" style="display:none;">
-            <div id="left"><div class="bot_wrapper"><div id="content"></div></div></div>
-            <div id="center"><div class="bot_wrapper"><div id="content"></div></div></div>
-            <div id="right"><div class="bot_wrapper"></div></div>
-        </div>
+    </div>
+
+    <!-- ══════════ Elementos legados (ocultos, usados pelo JS) ══════════ -->
+    <span id="user_text" style="display:none;"><%- lang('landing.usernamePlaceholder') %></span>
+
+    <button id="newsButton" style="display:none;">
+        <div id="newsButtonAlert" style="display: none;"></div>
+        <span id="newsButtonText"><%- lang('landing.newsButton') %></span>
+    </button>
+    <div id="lower" style="display:none;">
+        <div id="left"><div class="bot_wrapper"><div id="content"></div></div></div>
+        <div id="center"><div class="bot_wrapper"><div id="content"></div></div></div>
+        <div id="right"><div class="bot_wrapper"></div></div>
     </div>
 
     <div id="newsContainer" style="display:none;">
@@ -227,6 +193,6 @@
             </div>
         </div>
     </div>
-    
+
     <script src="./assets/js/scripts/landing.js"></script>
 </div>

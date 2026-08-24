@@ -9,6 +9,7 @@
  * @module authmanager
  */
 // Requirements
+const crypto                 = require('crypto')
 const ConfigManager          = require('./configmanager')
 const { LoggerUtil }         = require('helios-core')
 const { RestResponseStatus } = require('helios-core/common')
@@ -142,7 +143,6 @@ function mojangErrorDisplayable(errorCode) {
 exports.addMojangAccount = async function(username, password) {
     try {
         const response = await MojangRestAPI.authenticate(username, password, ConfigManager.getClientToken())
-        console.log(response)
         if(response.responseStatus === RestResponseStatus.SUCCESS) {
 
             const session = response.data
@@ -341,7 +341,9 @@ async function validateSelectedMojangAccount(){
             return true
         }
     }
-    
+
+    log.error('Error while validating selected profile:', response.error)
+    return false
 }
 
 /**
@@ -416,30 +418,53 @@ async function validateSelectedMicrosoftAccount(){
 exports.validateSelected = async function(){
     const current = ConfigManager.getSelectedAccount()
 
-    if(current.type === 'microsoft') {
+    if(current.type === 'offline') {
+        // Nothing to validate, there is no session to expire.
+        return true
+    } else if(current.type === 'microsoft') {
         return await validateSelectedMicrosoftAccount()
     } else {
         return await validateSelectedMojangAccount()
     }
-    
+
 }
 
 /**
- * Add an offline account.
- * 
+ * Compute the uuid a Minecraft server in offline mode assigns to a username.
+ * Mirrors Java's UUID.nameUUIDFromBytes("OfflinePlayer:<username>"), a name based
+ * (version 3, MD5) uuid. The uuid must match or the server will treat every login
+ * as a brand new player.
+ *
  * @param {string} username The account username.
- * @returns {Object} The authenticated account object.
+ * @returns {string} The offline uuid, without dashes.
+ */
+function offlineUUID(username) {
+    const hash = crypto.createHash('md5').update(`OfflinePlayer:${username}`, 'utf8').digest()
+    hash[6] = (hash[6] & 0x0f) | 0x30 // Version 3
+    hash[8] = (hash[8] & 0x3f) | 0x80 // IETF variant
+    return hash.toString('hex')
+}
+
+/**
+ * Add an offline account. No authentication is performed, the account is only
+ * usable on servers running with online-mode=false.
+ *
+ * @param {string} username The account username.
+ * @returns {Object} The account object.
  */
 exports.addOfflineAccount = function(username) {
-    const uuid = require('crypto').randomUUID().replace(/-/g, '')
-    const ret = ConfigManager.addMojangAuthAccount(
-        uuid,
-        'offline',
-        username,
-        username
-    )
-    ret.type = 'offline'
-    ConfigManager.getAuthAccounts()[ret.uuid].type = 'offline'
+    const ret = ConfigManager.addOfflineAuthAccount(offlineUUID(username), username)
     ConfigManager.save()
     return ret
+}
+
+/**
+ * Remove an offline account. Nothing to invalidate, it only exists locally.
+ *
+ * @param {string} uuid The UUID of the account to be removed.
+ * @returns {Promise.<void>} Promise which resolves to void when the action is complete.
+ */
+exports.removeOfflineAccount = async function(uuid){
+    ConfigManager.removeAuthAccount(uuid)
+    ConfigManager.save()
 }

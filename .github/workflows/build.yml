@@ -1,38 +1,40 @@
-name: Build
+name: Build & Publish
 
-on: push
+# Dispara ao empurrar uma tag tipo v1.0.3, ou manualmente pela aba Actions.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # necessário pra criar/atualizar o release
 
 jobs:
-  release:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
-    permissions:
-      contents: write
-
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-
-      - name: Install Dependencies
+      - name: Install deps
         run: npm ci
-        shell: bash
 
-      - name: Build
+      - name: Build & publish (electron-builder)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run dist
-        shell: bash
+          # Não temos certificado de assinatura — desliga a busca automática
+          # (senão o build do macOS falha procurando uma identidade).
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: npx electron-builder --publish always

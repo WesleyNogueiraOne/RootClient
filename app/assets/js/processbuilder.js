@@ -42,44 +42,112 @@ class ProcessBuilder {
     }
     
     /**
+     * Localiza o modulo do instalador do NeoForge na distribuicao e devolve
+     * { path, version }. Assim a versao nao fica hardcoded no codigo: basta
+     * atualizar o distribution.json.
+     *
+     * @returns {{path: string, version: string}|null}
+     */
+    _resolveNeoForgeInstaller(){
+        const mdl = this.server.modules.find(m => {
+            const t = m.rawModule.type
+            const id = m.rawModule.id || ''
+            return t === 'NeoForge' || id.includes('neoforge-installer')
+        })
+        if(mdl == null){
+            return null
+        }
+        const idParts = (mdl.rawModule.id || '').split(':')
+        const version = idParts.length > 0 ? idParts[idParts.length - 1] : 'unknown'
+        return { path: mdl.getPath(), version }
+    }
+
+    /**
+     * Garante que as libraries do NeoForge estao instaladas. Roda o instalador
+     * na primeira vez (assincrono, sem travar a UI) e falha com mensagem clara
+     * se algo der errado, em vez de deixar o jogo abrir quebrado.
+     *
+     * @param {function(string):void} onStatus Callback pra mostrar status na UI.
+     * @returns {Promise.<void>}
+     */
+    async installNeoForgeIfNeeded(onStatus = () => {}){
+        const installer = this._resolveNeoForgeInstaller()
+        if(installer == null){
+            return // Servidor nao usa NeoForge.
+        }
+
+        // Marcador por versao: se a versao exata ja foi instalada, pula. Assim,
+        // ao subir a versao do NeoForge no distro, o instalador roda de novo
+        // (o bootstrap generico existir nao basta — libraries mudam por versao).
+        const marker = path.join(this.commonDir, `.neoforge-installed-${installer.version}`)
+        if(fs.existsSync(marker)){
+            return // Esta versao ja esta instalada.
+        }
+
+        logger.info(`NeoForge ${installer.version} not installed, running installer...`)
+        if(!fs.existsSync(installer.path)){
+            const e = new Error('NeoForge installer not found: ' + installer.path)
+            e.displayable = 'Instalador do NeoForge nao encontrado. Reinstale o launcher ou verifique os arquivos do modpack.'
+            throw e
+        }
+
+        onStatus(`Instalando NeoForge ${installer.version} (pode demorar)...`)
+
+        // O instalador precisa de um launcher_profiles.json valido no diretorio.
+        const launcherProfilesPath = path.join(this.commonDir, 'launcher_profiles.json')
+        if(!fs.existsSync(launcherProfilesPath)){
+            fs.writeJsonSync(launcherProfilesPath, {
+                profiles: {},
+                selectedProfile: null,
+                clientToken: crypto.randomBytes(16).toString('hex'),
+                authenticationDatabase: {}
+            })
+            logger.info('Created launcher_profiles.json')
+        }
+
+        const javaExe = ConfigManager.getJavaExecutable(this.server.rawServer.id)
+
+        await new Promise((resolve, reject) => {
+            const child = child_process.spawn(javaExe, [
+                '-jar', installer.path,
+                '--installClient', this.commonDir
+            ], { cwd: this.commonDir })
+
+            let stderr = ''
+            child.stdout.on('data', d => logger.info('[NeoForge installer]', String(d).trim()))
+            child.stderr.on('data', d => { stderr += d; logger.warn('[NeoForge installer]', String(d).trim()) })
+            child.on('error', err => {
+                err.displayable = 'Nao foi possivel rodar o instalador do NeoForge (Java). Verifique se o Java esta ok.'
+                reject(err)
+            })
+            child.on('close', code => {
+                if(code === 0){
+                    resolve()
+                } else {
+                    const e = new Error(`NeoForge installer exited with code ${code}. ${stderr.slice(-400)}`)
+                    e.displayable = 'Falha ao instalar o NeoForge. Verifique sua conexao e tente novamente.'
+                    reject(e)
+                }
+            })
+        })
+
+        const bootstrapPath = path.join(this.commonDir, 'libraries', 'cpw', 'mods', 'bootstraplauncher')
+        if(!fs.existsSync(bootstrapPath)){
+            const e = new Error('NeoForge installer finished but libraries are missing.')
+            e.displayable = 'O NeoForge foi instalado mas os arquivos nao apareceram. Tente novamente.'
+            throw e
+        }
+        // Marca esta versao como instalada pra nao re-rodar o instalador toda vez.
+        fs.writeFileSync(marker, new Date().toISOString())
+        logger.info(`NeoForge ${installer.version} installed successfully.`)
+    }
+
+    /**
      * Convienence method to run the functions typically used to build a process.
      */
     build(){
     fs.ensureDirSync(this.gameDir)
-    
-    // ===== Verificar e instalar libraries do NeoForge =====
-    const bootstrapPath = path.join(this.commonDir, 'libraries', 'cpw', 'mods', 'bootstraplauncher')
-if(!fs.existsSync(bootstrapPath)) {
-    logger.info('NeoForge libraries not found, running installer...')
-    const installerPath = path.join(this.gameDir, 'files', 'neoforge-installer', '21.1.224', 'neoforge-installer-21.1.224.jar')
-    if(fs.existsSync(installerPath)) {
-            const javaExe = ConfigManager.getJavaExecutable(this.server.rawServer.id)
-            const launcherProfilesPath = path.join(this.commonDir, 'launcher_profiles.json')
-if(!fs.existsSync(launcherProfilesPath)) {
-    fs.writeJsonSync(launcherProfilesPath, {
-        profiles: {},
-        selectedProfile: null,
-        clientToken: require('crypto').randomBytes(16).toString('hex'),
-        authenticationDatabase: {}
-    })
-    logger.info('Created launcher_profiles.json')
-}
-            const result = require('child_process').spawnSync(javaExe, [
-    '-jar', installerPath,
-    '--installClient', this.commonDir
-], { 
-    stdio: 'pipe',
-    cwd: this.commonDir
-})
-logger.info('NeoForge installer stdout:', result.stdout?.toString())
-logger.info('NeoForge installer stderr:', result.stderr?.toString())
-logger.info('NeoForge installer exited with code:', result.status)
-        }
-        
-    }
-    
-    // ===== FIM NeoForge installer =====
-    
+
     for(let mdl of this.server.modules) {
         if(mdl.rawModule.type === 'File') {
             const srcFile = mdl.getPath()
@@ -124,7 +192,10 @@ logger.info('NeoForge installer exited with code:', result.status)
 
         // Hide access token
         const loggableArgs = [...args]
-        loggableArgs[loggableArgs.findIndex(x => x === this.authUser.accessToken)] = '**********'
+        const tokenIdx = loggableArgs.findIndex(x => x === this.authUser.accessToken)
+        if(tokenIdx > -1){
+            loggableArgs[tokenIdx] = '**********'
+        }
 
         logger.info('Launch Arguments:', loggableArgs)
 

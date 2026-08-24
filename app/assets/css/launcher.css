@@ -1,5 +1,6 @@
 /* Github Code Highlighting. */
 @import "./hoot-theme-v2.css";
+@import "./hoot-redesign.css";
 @import "../../../node_modules/github-syntax-dark/lib/github-dark.css";
 
 /*******************************************************************************

@@ -342,15 +342,6 @@ settingsNavDone.onclick = () => {
 const msftLoginLogger = LoggerUtil.getLogger('Microsoft Login')
 const msftLogoutLogger = LoggerUtil.getLogger('Microsoft Logout')
 
-// Bind the add mojang account button.
-document.getElementById('settingsAddMojangAccount').onclick = (e) => {
-    switchView(getCurrentView(), VIEWS.login, 500, 500, () => {
-        loginViewOnCancel = VIEWS.settings
-        loginViewOnSuccess = VIEWS.settings
-        loginCancelEnabled(true)
-    })
-}
-
 // Bind the add microsoft account button.
 document.getElementById('settingsAddMicrosoftAccount').onclick = (e) => {
     switchView(getCurrentView(), VIEWS.waiting, 500, 500, () => {
@@ -519,7 +510,10 @@ function processLogOut(val, isLastAccount){
             ipcRenderer.send(MSFT_OPCODE.OPEN_LOGOUT, uuid, isLastAccount)
         })
     } else {
-        AuthManager.removeMojangAccount(uuid).then(() => {
+        const removal = targetAcc.type === 'offline'
+            ? AuthManager.removeOfflineAccount(uuid)
+            : AuthManager.removeMojangAccount(uuid)
+        removal.then(() => {
             if(!isLastAccount && uuid === prevSelAcc.uuid){
                 const selAcc = ConfigManager.getSelectedAccount()
                 refreshAuthAccountSelected(selAcc.uuid)
@@ -532,6 +526,8 @@ function processLogOut(val, isLastAccount){
                 loginOptionsViewOnLoginCancel = VIEWS.loginOptions
                 switchView(getCurrentView(), VIEWS.loginOptions)
             }
+        }).catch(err => {
+            console.error('Error while logging out.', err)
         })
         $(parent).fadeOut(250, () => {
             parent.remove()

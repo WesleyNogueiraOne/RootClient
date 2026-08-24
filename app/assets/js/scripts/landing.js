@@ -76,6 +76,8 @@ function setLaunchDetails(details){
 function setLaunchPercentage(percent){
     launch_progress.setAttribute('max', 100)
     launch_progress.setAttribute('value', percent)
+    const _fill = document.getElementById('launch_progress_fill')
+    if(_fill) _fill.style.width = percent + '%'
     launch_progress_label.innerHTML = percent + '%'
 }
 
@@ -605,6 +607,9 @@ async function dlAsync(login = true) {
         }
 
         try {
+            // Instala o NeoForge na primeira vez (assincrono, com feedback).
+            await pb.installNeoForgeIfNeeded((msg) => setLaunchDetails(msg))
+
             // Build Minecraft process.
             proc = pb.build()
 
@@ -629,7 +634,7 @@ async function dlAsync(login = true) {
         } catch(err) {
 
             loggerLaunchSuite.error('Error during launch', err)
-            showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringLaunchTitle'), Lang.queryJS('landing.dlAsync.checkConsoleForDetails'))
+            showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringLaunchTitle'), err.displayable || Lang.queryJS('landing.dlAsync.checkConsoleForDetails'))
 
         }
     }

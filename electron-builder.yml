@@ -1,11 +1,16 @@
-appId: 'helioslauncher'
-productName: 'Helios Launcher'
+appId: 'com.rootrp.rootclient'
+productName: 'Root Client'
 artifactName: '${productName}-setup-${version}.${ext}'
 
-copyright: 'Copyright © 2018-2024 Daniel Scalzi'
+copyright: 'Copyright © 2026 Root RP'
 
 asar: true
 compression: 'maximum'
+
+publish:
+  provider: 'github'
+  owner: 'WesleyNogueiraOne'
+  repo: 'RootClient'
 
 files:
   - '!{dist,.gitignore,.vscode,docs,dev-app-update.yml,.nvmrc,.eslintrc.json}'
@@ -14,8 +19,9 @@ extraResources:
   - 'libraries'
 
 # Windows Configuration
-win: 
-  target: 
+win:
+  icon: 'app/assets/images/logo.ico'
+  target:
     - target: 'nsis'
       arch: 'x64'
 
@@ -25,9 +31,13 @@ nsis:
   perMachine: false
   allowElevation: true
   allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: 'Root Client'
 
 # macOS Configuration
 mac:
+  icon: 'app/assets/images/logo.png'
   target:
     - target: 'dmg'
       arch:
@@ -37,14 +47,14 @@ mac:
   category: 'public.app-category.games'
 
 # Linux Configuration
-linux: 
+linux:
+  icon: 'app/assets/images/logo.png'
   target: 'AppImage'
-  maintainer: 'Daniel Scalzi'
-  vendor: 'Daniel Scalzi'
-  synopsis: 'Modded Minecraft Launcher'
-  description: 'Custom launcher which allows users to join modded servers. All mods, configurations, and updates are handled automatically.'
+  maintainer: 'Root RP'
+  vendor: 'Root RP'
+  synopsis: 'Launcher do Root RP'
+  description: 'Launcher do servidor Root RP. Mods, configurações e atualizações automáticas.'
   category: 'Game'
-
 
 directories:
   buildResources: 'build'

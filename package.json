@@ -1,9 +1,9 @@
 {
-  "name": "hoot-client",
+  "name": "root-client",
   "version": "1.0.2",
-  "productName": "Hoot Client",
-  "description": "Hoot Client - Launcher HootRP",
-  "author": "HootRP",
+  "productName": "Root Client",
+  "description": "Root Client - Launcher Root RP",
+  "author": "Root RP",
   "license": "UNLICENSED",
   "homepage": "https://github.com/WesleyNogueiraOne",
   "bugs": {
@@ -17,18 +17,19 @@
     "dist:win": "npm run dist -- -w",
     "dist:mac": "npm run dist -- -m",
     "dist:linux": "npm run dist -- -l",
+    "publish": "electron-builder build -w --publish always",
     "lint": "eslint --config .eslintrc.json ."
   },
   "engines": {
     "node": "20.x.x"
   },
   "build": {
-    "appId": "com.hootrp.hootclient",
-    "productName": "Hoot Client",
+    "appId": "com.rootrp.rootclient",
+    "productName": "Root Client",
     "publish": {
         "provider": "github",
         "owner": "WesleyNogueiraOne",
-        "repo": "HootClient"
+        "repo": "RootClient"
     },
     "win": {
         "icon": "app/assets/images/logo.ico",
@@ -44,7 +45,7 @@
         "allowToChangeInstallationDirectory": true,
         "createDesktopShortcut": true,
         "createStartMenuShortcut": true,
-        "shortcutName": "Hoot Client"
+        "shortcutName": "Root Client"
     },
     "linux": {
         "icon": "app/assets/images/logo.png",
@@ -79,6 +80,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WesleyNogueiraOne/HeliosLauncher.git"
+    "url": "git+https://github.com/WesleyNogueiraOne/RootClient.git"
   }
 }

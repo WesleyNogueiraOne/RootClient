@@ -43,22 +43,16 @@ runeChars.forEach(r => {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Inserir slideshow dentro do hootMain
-    const hootMain = document.getElementById('hootMain')
-const mainDiv = document.getElementById('main')
-if (hootMain) {
+    // Inserir slideshow + runas no fundo (fixos, atrás de tudo)
     document.body.insertBefore(bgSlideshow, document.body.firstChild)
     document.body.insertBefore(bgRunes, document.body.firstChild)
-} else if (mainDiv) {
-    mainDiv.insertBefore(bgSlideshow, mainDiv.firstChild)
-}
 
     // Coruja GIF
     const seal = document.getElementById('image_seal')
     if (seal) {
         seal.src = 'assets/images/logo.png'
-        seal.style.borderRadius = '50%'
-        seal.style.objectFit = 'cover'
+        seal.style.borderRadius = '0'
+        seal.style.objectFit = 'contain'
     }
 
     // Sincronizar nome do jogador

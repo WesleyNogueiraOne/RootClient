@@ -38,6 +38,10 @@ loginPasswordDisclaimer2 = "{appName} não é afiliado à Mojang AB."
 loginOptionsTitle = "Opções de Login"
 loginWithMicrosoft = "Entrar com Microsoft"
 loginWithMojang = "Entrar com Mojang"
+loginWithOffline = "Entrar sem conta (Offline)"
+offlineUsernamePlaceholder = "Digite seu nickname"
+offlineConfirmButton = "Entrar"
+offlineBackButton = "Voltar"
 cancelButton = "Cancelar"
 
 [ejs.overlay]
@@ -150,6 +154,15 @@ requiredValue = "* Obrigatório"
 [js.login.error.unknown]
 title = "Erro Desconhecido no Login"
 desc = "Um erro desconhecido ocorreu. Verifique o console para mais detalhes."
+
+[js.loginOptions.offline]
+placeholder = "Digite seu nickname"
+confirm = "Entrar"
+loggingIn = "Entrando..."
+errorTooShort = "Mínimo 3 caracteres!"
+errorTooLong = "Máximo 16 caracteres!"
+errorInvalidChars = "Apenas letras, números e _"
+errorGeneric = "Erro ao entrar, tente novamente"
 
 [js.landing.launch]
 pleaseWait = "Aguarde.."
