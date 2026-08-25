@@ -1,6 +1,6 @@
 {
   "name": "root-client",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "productName": "Root Client",
   "description": "Root Client - Launcher Root RP",
   "author": "Root RP",
@@ -12,6 +12,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
+    "postinstall": "patch-package",
     "start": "electron .",
     "dist": "electron-builder build",
     "dist:win": "npm run dist -- -w",
@@ -27,35 +28,41 @@
     "appId": "com.rootrp.rootclient",
     "productName": "Root Client",
     "publish": {
-        "provider": "github",
-        "owner": "WesleyNogueiraOne",
-        "repo": "RootClient"
+      "provider": "github",
+      "owner": "WesleyNogueiraOne",
+      "repo": "RootClient"
     },
     "win": {
-        "icon": "app/assets/images/logo.ico",
-        "target": [
-            {
-                "target": "nsis",
-                "arch": ["x64"]
-            }
-        ]
+      "icon": "app/assets/images/logo.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "nsis": {
-        "oneClick": false,
-        "allowToChangeInstallationDirectory": true,
-        "createDesktopShortcut": true,
-        "createStartMenuShortcut": true,
-        "shortcutName": "Root Client"
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Root Client"
     },
     "linux": {
-        "icon": "app/assets/images/logo.png",
-        "target": ["AppImage"]
+      "icon": "app/assets/images/logo.png",
+      "target": [
+        "AppImage"
+      ]
     },
     "mac": {
-        "icon": "app/assets/images/logo.png",
-        "target": ["dmg"]
+      "icon": "app/assets/images/logo.png",
+      "target": [
+        "dmg"
+      ]
     }
-},
+  },
   "dependencies": {
     "@electron/remote": "^2.1.2",
     "adm-zip": "^0.5.16",
@@ -76,7 +83,8 @@
   "devDependencies": {
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
-    "eslint": "^8.57.1"
+    "eslint": "^8.57.1",
+    "patch-package": "^8.0.1"
   },
   "repository": {
     "type": "git",
