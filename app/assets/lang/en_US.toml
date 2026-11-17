@@ -211,9 +211,10 @@ checkConsoleForDetails = "Verifique o console (CTRL + Shift + i) para mais detal
 checking = "Verificando Novidades"
 
 [js.landing.discord]
-loading = "Carregando jogo.."
-joining = "Entrando no servidor!"
-joined = "Explorando o mundo!"
+loading = "Carregando o jogo"
+menu = "No menu principal"
+joining = "Entrando no servidor"
+joined = "Explorando Selenia"
 
 [js.overlay]
 dismiss = "Fechar"

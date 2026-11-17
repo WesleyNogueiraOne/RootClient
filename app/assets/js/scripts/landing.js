@@ -700,6 +700,8 @@ let hasRPC = false
 // Joined server regex
 // Change this if your server uses something different.
 const GAME_JOINED_REGEX = /\[.+\]: Sound engine started/
+// Tela "Conectando…" do multiplayer.
+const SERVER_CONNECTING_REGEX = /ConnectScreen.*: Connecting to /
 const GAME_LAUNCH_REGEX = /^\[.+\]: (?:MinecraftForge .+ Initialized|ModLauncher .+ starting: .+|Loading Minecraft .+ with Fabric Loader .+|Setting user: .+)$/
 // O stdout do Java chega em blocos com várias linhas: testar linha a linha,
 // senão as regex com ^...$ nunca casam e a tela fica presa em "preparando".
@@ -829,8 +831,10 @@ async function dlAsync(login = true) {
         let pb = new ProcessBuilder(serv, versionData, modLoaderData, authUser, remote.app.getVersion())
         setLaunchDetails(Lang.queryJS('landing.dlAsync.launchingGame'))
 
-        // const SERVER_JOINED_REGEX = /\[.+\]: \[CHAT\] [a-zA-Z0-9_]{1,16} joined the game/
-        const SERVER_JOINED_REGEX = new RegExp(`\\[.+\\]: \\[CHAT\\] ${authUser.displayName} joined the game`)
+        // No 1.21 a linha vem como "[System] [CHAT] Nick joined the game". As conquistas carregam
+        // logo depois do login, então servem de reserva se a mensagem de entrada estiver desligada.
+        const nick = String(authUser.displayName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const SERVER_JOINED_REGEX = new RegExp(`\\[CHAT\\] ${nick} joined the game|: Loaded \\d+ advancements`)
 
         let loadCompleted = false
         const onLoadComplete = () => {
@@ -866,12 +870,21 @@ async function dlAsync(login = true) {
         }
 
         // Listener for Discord RPC.
+        // O som reinicia ao entrar no servidor e ao recarregar recursos: "menu" só antes de conectar.
+        let rpcState = null
+        const setRpcState = (state) => {
+            if(state === rpcState) return
+            rpcState = state
+            DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.' + state))
+        }
         const gameStateChange = function(data){
             forEachLine(data, line => {
                 if(SERVER_JOINED_REGEX.test(line)){
-                    DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.joined'))
-                } else if(GAME_JOINED_REGEX.test(line)){
-                    DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.joining'))
+                    setRpcState('joined')
+                } else if(SERVER_CONNECTING_REGEX.test(line)){
+                    setRpcState('joining')
+                } else if(rpcState == null && GAME_JOINED_REGEX.test(line)){
+                    setRpcState('menu')
                 }
             })
         }
