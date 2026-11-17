@@ -101,6 +101,7 @@ document.getElementById('launch_button').addEventListener('click', async e => {
     loggerLanding.info('Launching game..')
     try {
         const server = (await DistroAPI.getDistribution()).getServerById(ConfigManager.getSelectedServer())
+        if(!(await rcEnsureAccess(server.rawServer))) return
         const jExe = ConfigManager.getJavaExecutable(ConfigManager.getSelectedServer())
         if(jExe == null){
             await asyncSystemScan(server.effectiveJavaOptions)
@@ -186,10 +187,15 @@ function updateSelectedServer(serv){
 // ═══════════════════════════════ PORTAIS (versões na ficha)
 // Campos opcionais por servidor no distribution.json:
 //   "shortName": "Staff"                  rótulo do chip (padrão: o que vem depois de " · " no name)
-//   "access": ["MANAGER","ADMIN","OWNER"] quem vê o portal: role ou staffTitle do /api/launcher/me.
+//   "access": ["APOIADOR"]                quem abre o portal (conta vinculada ao site, /api/launcher/me):
+//                                           "APOIADOR" = qualquer nível de apoio (ou cargo SUPPORTER)
+//                                           "STAFF"    = cargo MANAGER/ADMIN/OWNER ou cargo da staff no Discord
+//                                           ou um role / staffTitle exato. Staff abre todos os portais.
 //                                         Sem "access", todos veem.
-// Esconder um portal é só UX: o distribution.json é público.
+// Esconder um portal é só UX: o distribution.json é público. Quem trava de verdade é a whitelist do servidor.
 let rcMe = null
+const RC_STAFF_ROLES = ['MANAGER', 'ADMIN', 'OWNER']
+const RC_ME_CACHE = 'rc-me-access'
 
 function rcPortalShortName(raw) {
     if(raw.shortName) return raw.shortName
@@ -197,16 +203,67 @@ function rcPortalShortName(raw) {
     return parts[parts.length - 1]
 }
 
+function rcIsStaff(me) {
+    return !!me && (RC_STAFF_ROLES.includes(me.role) || me.staffTitle != null)
+}
+
+function rcIsSupporter(me) {
+    return !!me && (me.tier != null || me.role === 'SUPPORTER')
+}
+
 function rcPortalAllowed(raw) {
     if(!Array.isArray(raw.access) || raw.access.length === 0) return true
     if(!rcMe) return false
-    return raw.access.includes(rcMe.role) || (rcMe.staffTitle != null && raw.access.includes(rcMe.staffTitle))
+    if(rcIsStaff(rcMe)) return true
+    return (raw.access.includes('APOIADOR') && rcIsSupporter(rcMe))
+        || raw.access.includes(rcMe.role)
+        || (rcMe.staffTitle != null && raw.access.includes(rcMe.staffTitle))
+}
+
+/** Portal só da staff (o chip ganha o selo de restrito). */
+function rcPortalStaffOnly(raw) {
+    return Array.isArray(raw.access) && raw.access.length > 0 && !raw.access.includes('APOIADOR')
 }
 
 /** Servidores que este jogador pode abrir. O selecionado sempre entra, pra ninguém ficar preso. */
 function rcVisibleServers(distro) {
     const sel = ConfigManager.getSelectedServer()
     return distro.servers.filter(s => s.rawServer.id === sel || rcPortalAllowed(s.rawServer))
+}
+
+/**
+ * Se o portal selecionado não é permitido, pula pro primeiro que for (a principal primeiro).
+ * Retorna true quando trocou (o updateSelectedServer já redesenha os portais).
+ */
+function rcFixSelectedPortal(distro) {
+    if(rcPortaisLocked()) return false
+    const cur = distro.getServerById(ConfigManager.getSelectedServer())
+    if(cur == null || rcPortalAllowed(cur.rawServer)) return false
+    const allowed = distro.servers.filter(s => rcPortalAllowed(s.rawServer))
+    const next = allowed.find(s => s.rawServer.mainServer) || allowed[0]
+    if(next == null) return false
+    updateSelectedServer(next)
+    return true
+}
+
+/**
+ * Trava do Jogar: o portal selecionado precisa estar liberado pra conta vinculada.
+ * Antes de barrar, consulta o site de novo (quem acabou de apoiar não precisa reabrir o launcher).
+ */
+async function rcEnsureAccess(raw) {
+    if(rcPortalAllowed(raw)) return true
+    await refreshSiteLink()
+    if(rcPortalAllowed(raw)) return true
+    if(!rcMe) {
+        window.rcToast && window.rcToast('Vincule sua conta', 'O Root RP está aberto para apoiadores. Vincule o launcher à sua conta do site para jogar.', '◆', 6000)
+        rcShowGazetaTab('tickets')
+    } else if(rcPortalStaffOnly(raw)) {
+        window.rcToast && window.rcToast('Portal da staff', 'Esta versão é só para a staff.', '◆', 4000)
+    } else {
+        window.rcToast && window.rcToast('Só para apoiadores', 'Nesta fase o Root RP está aberto só para apoiadores. Apoie no site e volte aqui: o acesso libera na hora.', '◆', 7000)
+        shell.openExternal('https://rootrp.com.br/apoiar')
+    }
+    return false
 }
 
 function rcPortaisLocked() {
@@ -219,6 +276,7 @@ async function renderPortais() {
     let distro
     try { distro = await DistroAPI.getDistribution() } catch { return }
     if(distro == null) return
+    if(rcFixSelectedPortal(distro)) return
 
     const sel = ConfigManager.getSelectedServer()
     const servers = rcVisibleServers(distro)
@@ -234,7 +292,7 @@ async function renderPortais() {
     list.innerHTML = servers.map(s => {
         const raw = s.rawServer
         const active = raw.id === sel
-        const restricted = Array.isArray(raw.access) && raw.access.length > 0
+        const restricted = rcPortalStaffOnly(raw)
         return `<button class="rc-portal${active ? ' is-active' : ''}${restricted ? ' is-restricted' : ''}" role="radio" aria-checked="${active}"
             data-servid="${rcEscape(raw.id)}" data-tip="${rcEscape(raw.description || raw.name)}">${rcEscape(rcPortalShortName(raw))}</button>`
     }).join('')
@@ -1139,6 +1197,12 @@ async function refreshSiteLink() {
     const el = document.getElementById('rcFichaLink')
     const me = await ipcRenderer.invoke('rc:me').catch(() => null)
     rcMe = me && !me.error ? me : null
+    // Só o acesso vai pro cache: se o site cair (me == null), o apoiador não fica trancado do lado de fora.
+    try {
+        if(rcMe) localStorage.setItem(RC_ME_CACHE, JSON.stringify({ role: rcMe.role, staffTitle: rcMe.staffTitle, tier: rcMe.tier }))
+        else if(me && me.error) localStorage.removeItem(RC_ME_CACHE)
+        else if(me == null) rcMe = JSON.parse(localStorage.getItem(RC_ME_CACHE) || 'null')
+    } catch {}
     renderPortais()
     if(me && !me.error) {
         el.textContent = 'Vinculado'

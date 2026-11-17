@@ -66,7 +66,7 @@
         const c = el('div', 'rc-ticket rc-ticket--link')
         c.appendChild(el('span', 'rc-eyebrow', 'Vincular ao site'))
         c.appendChild(el('h3', 'rc-ticket-heading', 'Conecte o launcher à sua conta Root'))
-        c.appendChild(el('p', 'rc-ticket-text', 'Com o vínculo você abre tickets direto daqui, recebe respostas da staff e avisos importantes.'))
+        c.appendChild(el('p', 'rc-ticket-text', 'O vínculo libera o Root RP para apoiadores e as versões da staff. Também abre tickets direto daqui, com respostas da staff e avisos importantes.'))
         const b = button('Vincular conta', true)
         b.onclick = async () => {
             const r = await rc.linkStart().catch(() => null)

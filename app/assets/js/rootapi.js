@@ -33,7 +33,7 @@ const fs = require('fs')
 const path = require('path')
 const os = require('os')
 
-const SITE = process.env.ROOT_SITE || 'https://rootrp-site.vercel.app'
+const SITE = process.env.ROOT_SITE || 'https://rootrp.com.br'
 const TOKEN_FILE = path.join(app.getPath('userData'), 'rc-token.bin')
 
 // Assinatura HMAC opcional (se o site tiver LAUNCHER_APP_SECRET e você embutir o mesmo aqui).
