@@ -99,6 +99,8 @@ function setLaunchEnabled(val){
 // Bind launch button
 document.getElementById('launch_button').addEventListener('click', async e => {
     loggerLanding.info('Launching game..')
+    // atualização obrigatória do launcher (uicore.js)
+    if(window.rcUpdateBlocksLaunch && window.rcUpdateBlocksLaunch()) return
     try {
         const server = (await DistroAPI.getDistribution()).getServerById(ConfigManager.getSelectedServer())
         if(!(await rcEnsureAccess(server.rawServer))) return

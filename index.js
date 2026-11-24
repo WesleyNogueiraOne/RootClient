@@ -40,6 +40,10 @@ function initAutoUpdater(event, data) {
     autoUpdater.on('update-downloaded', (info) => {
         event.sender.send('autoUpdateNotification', 'update-downloaded', info)
     })
+    // progresso pra tela de atualização obrigatória
+    autoUpdater.on('download-progress', (progress) => {
+        event.sender.send('autoUpdateNotification', 'download-progress', { percent: progress.percent })
+    })
     autoUpdater.on('update-not-available', (info) => {
         event.sender.send('autoUpdateNotification', 'update-not-available', info)
     })

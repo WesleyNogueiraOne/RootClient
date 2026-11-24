@@ -61,7 +61,10 @@ exports.getAbsoluteMaxRAM = function(ram){
 
 function resolveSelectedRAM(ram) {
     if(ram?.recommended != null) {
-        return `${ram.recommended}M`
+        // RAM recomendada por versão (javaOptions.ram no distro), limitada à metade da
+        // memória do PC: mais que isso deixa o sistema sem memória e trava tudo.
+        const halfMB = Math.floor(os.totalmem() / 1048576 / 2 / 512) * 512
+        return `${Math.max(Math.min(ram.recommended, halfMB), ram.minimum || 2048)}M`
     } else {
         // Legacy behavior
         const mem = os.totalmem()

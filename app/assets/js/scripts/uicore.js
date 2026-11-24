@@ -36,6 +36,53 @@ remote.getCurrentWebContents().on('devtools-opened', () => {
 webFrame.setZoomLevel(0)
 webFrame.setVisualZoomLevelLimits(1, 1)
 
+// Atualização obrigatória: com versão nova publicada, o launcher não deixa jogar
+// até atualizar (servidor e launcher precisam andar juntos). Se a checagem falhar
+// (sem internet, GitHub fora do ar), libera: ninguém pode ficar preso sem jogar.
+// em produção já começa conferindo: um clique rápido em Jogar não passa antes da checagem
+const rcUpdate = { status: isDev ? 'idle' : 'checking', version: null, percent: 0, darwinUrl: null, checkingSince: Date.now() }
+
+function rcShowUpdateGate(){
+    const v = rcUpdate.version ? ` v${rcUpdate.version}` : ''
+    if(rcUpdate.status === 'downloaded'){
+        setOverlayContent('Atualização obrigatória',
+            `O Root Client${v} já foi baixado. Reinicie o launcher pra continuar jogando.`,
+            'Reiniciar e atualizar')
+        setOverlayHandler(() => ipcRenderer.send('autoUpdateAction', 'installUpdateNow'))
+    } else if(rcUpdate.status === 'manual'){
+        setOverlayContent('Atualização obrigatória',
+            `Saiu o Root Client${v}. No Mac, baixe e instale a versão nova pra continuar jogando.`,
+            'Baixar atualização')
+        setOverlayHandler(() => shell.openExternal(rcUpdate.darwinUrl))
+    } else {
+        setOverlayContent('Atualização obrigatória',
+            `Baixando o Root Client${v}: ${Math.floor(rcUpdate.percent)}%.<br>Assim que terminar, é só reiniciar o launcher.`,
+            'Baixando...')
+        setOverlayHandler(() => {})
+    }
+    if(!document.getElementById('main').hasAttribute('overlay')){
+        toggleOverlay(true, false)
+    }
+}
+
+/**
+ * Chamado pelo botão Jogar: true quando o jogo não pode abrir por causa de atualização.
+ */
+window.rcUpdateBlocksLaunch = function(){
+    if(['downloading', 'downloaded', 'manual'].includes(rcUpdate.status)){
+        rcShowUpdateGate()
+        return true
+    }
+    // ainda conferindo (até 20 s): espera o resultado em vez de abrir a versão velha
+    if(rcUpdate.status === 'checking' && Date.now() - rcUpdate.checkingSince < 20000){
+        if(typeof window.rcToast === 'function'){
+            window.rcToast('Conferindo atualizações', 'Um instante, já libera o Jogar.', '⟳')
+        }
+        return true
+    }
+    return false
+}
+
 // Initialize auto updates in production environments.
 let updateCheckListener
 if(!isDev){
@@ -44,28 +91,47 @@ if(!isDev){
             case 'checking-for-update':
                 loggerAutoUpdater.info('Checking for update..')
                 settingsUpdateButtonStatus(Lang.queryJS('uicore.autoUpdate.checkingForUpdateButton'), true)
+                if(rcUpdate.status === 'idle' || rcUpdate.status === 'none' || rcUpdate.status === 'error'){
+                    rcUpdate.status = 'checking'
+                    rcUpdate.checkingSince = Date.now()
+                }
                 break
             case 'update-available':
                 loggerAutoUpdater.info('New update available', info.version)
-                
+                rcUpdate.version = info.version
                 if(process.platform === 'darwin'){
-                    info.darwindownload = `https://github.com/WesleyNogueiraOne/RootClient/releases/download/v${info.version}/root-client-setup-${info.version}-${process.arch === 'arm64' ? 'arm64' : 'x64'}.dmg`
+                    // os instaladores ficam no repo público (o RootClient é privado)
+                    info.darwindownload = `https://github.com/WesleyNogueiraOne/RootClient-releases/releases/download/v${info.version}/root-client-setup-${info.version}-${process.arch === 'arm64' ? 'arm64' : 'x64'}.dmg`
+                    rcUpdate.status = 'manual'
+                    rcUpdate.darwinUrl = info.darwindownload
                     showUpdateUI(info)
+                } else if(rcUpdate.status !== 'downloaded'){
+                    rcUpdate.status = 'downloading'
                 }
-                
+                rcShowUpdateGate()
                 populateSettingsUpdateInformation(info)
+                break
+            case 'download-progress':
+                if(rcUpdate.status === 'downloading'){
+                    rcUpdate.percent = info.percent || 0
+                    rcShowUpdateGate()
+                }
                 break
             case 'update-downloaded':
                 loggerAutoUpdater.info('Update ' + info.version + ' ready to be installed.')
+                rcUpdate.status = 'downloaded'
+                rcUpdate.version = info.version
                 settingsUpdateButtonStatus(Lang.queryJS('uicore.autoUpdate.installNowButton'), false, () => {
                     if(!isDev){
                         ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
                     }
                 })
                 showUpdateUI(info)
+                rcShowUpdateGate()
                 break
             case 'update-not-available':
                 loggerAutoUpdater.info('No new update found.')
+                if(rcUpdate.status === 'checking') rcUpdate.status = 'none'
                 settingsUpdateButtonStatus(Lang.queryJS('uicore.autoUpdate.checkForUpdatesButton'))
                 break
             case 'ready':
@@ -75,6 +141,13 @@ if(!isDev){
                 ipcRenderer.send('autoUpdateAction', 'checkForUpdate')
                 break
             case 'realerror':
+                // checagem ou download falhou: libera o Jogar (o que já foi baixado continua valendo)
+                if(rcUpdate.status === 'checking' || rcUpdate.status === 'downloading'){
+                    rcUpdate.status = 'error'
+                    if(document.getElementById('main').hasAttribute('overlay') && document.getElementById('overlayTitle').innerHTML === 'Atualização obrigatória'){
+                        toggleOverlay(false)
+                    }
+                }
                 if(info != null && info.code != null){
                     if(info.code === 'ERR_UPDATER_INVALID_RELEASE_FEED'){
                         loggerAutoUpdater.info('No suitable releases found.')

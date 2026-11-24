@@ -211,6 +211,70 @@ class ProcessBuilder {
     }
 
     /**
+     * Aplica os presets da versão (campo "presets" do servidor no distribution.json):
+     * vídeo do options.txt e chaves de configs de mods (ex: alcance do Distant Horizons
+     * na Imersiva, RenderScale na Lite).
+     *
+     *   "presets": { "version": 1, "files": [
+     *     { "file": "options.txt", "format": "options", "set": { "renderDistance": "8" } },
+     *     { "file": "config/DistantHorizons.toml", "format": "toml", "set": { "lodChunkRenderDistanceRadius": "128" } } ] }
+     *
+     * Roda depois dos packs e só uma vez por "version": depois disso o jogador muda o
+     * que quiser e o launcher não mexe mais. Subir a "version" no distro reaplica.
+     * Os valores são o texto cru que vai no arquivo (strings do options.txt com aspas).
+     */
+    applyPresets(){
+        const presets = this.server.rawServer.presets
+        if(!presets || !Array.isArray(presets.files) || !presets.files.length) return
+        const markerPath = path.join(this.gameDir, '.rootclient', 'presets.json')
+        let applied = null
+        try { applied = fs.readJsonSync(markerPath).version } catch(e) { /* nunca aplicado */ }
+        if(applied === presets.version) return
+
+        const escapeRx = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        for(const preset of presets.files){
+            if(!preset || !preset.file || !preset.set) continue
+            const abs = path.resolve(this.gameDir, preset.file)
+            if(!abs.startsWith(path.resolve(this.gameDir) + path.sep)) {
+                logger.warn('Preset fora do gameDir, ignorado:', preset.file)
+                continue
+            }
+            const exists = fs.existsSync(abs)
+            // toml só é editado: criar um sem as seções quebraria o mod.
+            if(!exists && preset.format === 'toml') {
+                logger.warn('Preset ignorado, arquivo não existe:', preset.file)
+                continue
+            }
+            let text = exists ? fs.readFileSync(abs, 'utf8') : ''
+            for(const [key, value] of Object.entries(preset.set)){
+                const k = escapeRx(key)
+                let rx, line
+                switch(preset.format){
+                    case 'options':    rx = new RegExp(`^${k}:.*$`, 'm');           line = `${key}:${value}`; break
+                    case 'properties': rx = new RegExp(`^${k}=.*$`, 'm');           line = `${key}=${value}`; break
+                    case 'toml':       rx = new RegExp(`^(\\s*)${k}\\s*=.*$`, 'm'); line = `${key} = ${value}`; break
+                    case 'json':       rx = new RegExp(`"${k}"\\s*:\\s*[^,\\n}]+`); line = `"${key}": ${JSON.stringify(value)}`; break
+                    default: logger.warn('Formato de preset desconhecido:', preset.format); continue
+                }
+                if(rx.test(text)) {
+                    text = text.replace(rx, (m, indent) => preset.format === 'toml' ? (indent || '') + line : line)
+                } else if(preset.format === 'json') {
+                    text = text.trim() ? text.replace(/\{/, `{\n  ${line},`) : `{\n  ${line}\n}\n`
+                } else if(preset.format !== 'toml') {
+                    // o Minecraft completa o resto do options.txt na primeira abertura
+                    if(!text && preset.format === 'options') text = 'version:3955\n'
+                    text += (text && !text.endsWith('\n') ? '\n' : '') + line + '\n'
+                } else {
+                    logger.warn(`Preset: chave ${key} não encontrada em ${preset.file}`)
+                }
+            }
+            fs.outputFileSync(abs, text)
+        }
+        fs.outputJsonSync(markerPath, { version: presets.version })
+        logger.info(`Presets da versão aplicados (v${presets.version}).`)
+    }
+
+    /**
      * Copia os mods Fabric e jars de serviço (Sinytra Connector) pra gameDir/mods.
      * Guarda quais arquivos foram colocados pelo launcher, pra tirar os que saíram
      * do distro sem tocar em mods que o jogador colocou na pasta.
@@ -262,7 +326,13 @@ class ProcessBuilder {
             }
         }
     }
-        
+    try {
+        this.applyPresets()
+    } catch(e) {
+        // preset com problema não pode impedir o jogo de abrir
+        logger.warn('Falha ao aplicar presets da versão:', e)
+    }
+
         const tempNativePath = path.join(os.tmpdir(), ConfigManager.getTempNativeFolder(), crypto.pseudoRandomBytes(16).toString('hex'))
         process.throwDeprecation = true
         this.setupLiteLoader()
